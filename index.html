@@ -81,7 +81,6 @@
       <button class="tab" data-tab="accounts" onclick="switchTab('accounts')">Contas</button>
       <button class="tab" data-tab="sales" onclick="switchTab('sales')">Vendas</button>
       <button class="tab" data-tab="replacements" onclick="switchTab('replacements')">Reposições</button>
-      <button class="tab" data-tab="sql" onclick="switchTab('sql')">Setup SQL</button>
     </div>
 
     <section id="tab-dashboard" class="tab-body">
@@ -186,14 +185,6 @@
       </div>
     </section>
 
-    <section id="tab-sql" class="tab-body hidden">
-      <div class="panel">
-        <h2>Setup SQL</h2>
-        <p class="muted">Se as tabelas ainda não existirem, aplique o arquivo <span class="mono">sql/setup.sql</span> no Supabase. O site usa apenas tabelas prefixed com <span class="mono">warranty_</span>.</p>
-        <div class="notice small">Como eu ainda não encontrei um canal direto de DDL nessa VPS, deixei a migration pronta e isolada. Assim que o SQL for aplicado, o app já passa a operar no Supabase.</div>
-        <pre id="sqlPreview" class="mono" style="white-space:pre-wrap; background:#091124; padding:16px; border-radius:14px; border:1px solid var(--line); max-height:520px; overflow:auto"></pre>
-      </div>
-    </section>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -408,9 +399,7 @@ function handleWhatsappInput(){
 function switchTab(name){ document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===name)); document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden')); document.getElementById('tab-'+name).classList.remove('hidden'); }
 function unlockApp(){ if(document.getElementById('pinInput').value !== APP_PIN) return toast('PIN inválido.'); localStorage.setItem('warranty_hub_ok','1'); document.getElementById('loginView').classList.add('hidden'); document.getElementById('appView').classList.remove('hidden'); loadAll(); }
 function logout(){ localStorage.removeItem('warranty_hub_ok'); location.reload(); }
-async function loadSqlPreview(){ try{ const res = await fetch('./sql/setup.sql'); document.getElementById('sqlPreview').textContent = await res.text(); }catch{ document.getElementById('sqlPreview').textContent='Arquivo SQL não encontrado.'; } }
 if(localStorage.getItem('warranty_hub_ok')==='1'){ document.getElementById('loginView').classList.add('hidden'); document.getElementById('appView').classList.remove('hidden'); loadAll(); }
-loadSqlPreview();
 </script>
 </body>
 </html>
