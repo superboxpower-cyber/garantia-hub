@@ -56,6 +56,7 @@
     .section-title h2{margin:0;font-size:1.1rem}
     .section-title p{margin:4px 0 0;color:var(--muted);font-size:.88rem}
     .grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+    .stack{display:grid;gap:18px}
     .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}
     .geo-inline{display:none;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(73,168,255,.12),rgba(73,168,255,.05));border:1px solid rgba(73,168,255,.14)}
     .geo-flag{font-size:1.45rem;line-height:1}
@@ -121,7 +122,6 @@
           <div>
             <div class="eyebrow">Central operacional</div>
             <h1 class="title" style="margin-top:6px">Central de Garantias</h1>
-            <p class="subtitle" style="max-width:760px">Visual mais direto para acompanhar estoque, vencimentos, contas entregues e trocas dentro da garantia.</p>
           </div>
           <div class="topbar-actions">
             <button class="btn btn-secondary" onclick="loadAll()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
@@ -133,14 +133,29 @@
 
         <section id="tab-dashboard" class="tab-body">
           <div class="grid-2">
-            <div class="glass panel">
-              <div class="section-title">
-                <div>
-                  <h2>Garantias ativas e vencimentos</h2>
-                  <p>Visão rápida para agir antes do cliente cobrar.</p>
+            <div class="stack">
+              <div class="glass panel">
+                <div class="section-title">
+                  <div>
+                    <h2>Busca operacional por cliente ou conta</h2>
+                    <p>Digite nome, WhatsApp, conta original ou conta de reposição.</p>
+                  </div>
                 </div>
+                <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">
+                  <input id="dashboardSearch" class="field" placeholder="Ex.: Túlio, 85987280047, conta03@gmail.com" oninput="renderDashboardSearch()">
+                  <button class="btn btn-secondary" onclick="clearDashboardSearch()"><i class="fa-solid fa-broom"></i> Limpar</button>
+                </div>
+                <div id="dashboardSearchResults" style="margin-top:14px"></div>
               </div>
-              <div class="table-shell" id="salesTableWrap"></div>
+              <div class="glass panel">
+                <div class="section-title">
+                  <div>
+                    <h2>Garantias ativas e vencimentos</h2>
+                    <p>Visão rápida para agir antes do cliente cobrar.</p>
+                  </div>
+                </div>
+                <div class="table-shell" id="salesTableWrap"></div>
+              </div>
             </div>
             <div>
               <div class="glass panel">
@@ -361,7 +376,7 @@ function fillSelectors(){
   $('sale_initial_account_id').innerHTML = accOptions; $('replacement_account_id').innerHTML = accOptions;
   $('replacement_sale_id').innerHTML = ['<option value="">Selecione a venda</option>'].concat(state.sales.map(s=>{ const c=customerById(s.customer_id); return `<option value="${s.id}">${c.name || 'Cliente'} · ${fmtDate(s.sold_at)} · ${guaranteeEnd(s)}</option>`; })).join('');
 }
-function renderAll(){ renderKpis(); renderDashboard(); renderCustomers(); renderAccounts(); renderSales(); renderReplacements(); renderManagerSummary(); }
+function renderAll(){ renderKpis(); renderDashboard(); renderCustomers(); renderAccounts(); renderSales(); renderReplacements(); renderManagerSummary(); renderDashboardSearch(); }
 function renderKpis(){
   const active = state.sales.filter(s => (daysLeft(guaranteeEnd(s)) ?? -999) >= 0).length;
   const expiring = state.sales.filter(s => { const d=daysLeft(guaranteeEnd(s)); return d!==null && d>=0 && d<=3; }).length;
@@ -386,6 +401,69 @@ function renderDashboard(){
   $('alertsList').innerHTML = alerts.map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.title}</div><div class="item-meta">${a.body}</div></div><span class="chip ${a.tone==='yellow'?'yellow':a.tone==='red'?'red':'green'}">${a.tone==='yellow'?'Atenção':a.tone==='red'?'Crítico':'Ok'}</span></div></div>`).join('');
   renderSalesTable();
 }
+function buildDashboardMatches(query){
+  const q = String(query || '').trim().toLowerCase();
+  if(!q) return [];
+  return state.sales.filter(s=>{
+    const c = customerById(s.customer_id);
+    const initial = accountById(s.initial_account_id);
+    const current = accountById(currentAccountForSale(s));
+    const reps = replacementsBySale(s.id).map(r => accountById(r.replacement_account_id));
+    const hay = [
+      c.name, c.whatsapp, c.country_name,
+      initial.label, initial.login,
+      current.label, current.login,
+      ...reps.flatMap(a => [a?.label, a?.login])
+    ].filter(Boolean).join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+}
+function renderDashboardSearch(){
+  const host = $('dashboardSearchResults');
+  if(!host) return;
+  const q = val('dashboardSearch');
+  if(!q){
+    host.innerHTML = '<div class="empty">Busque por cliente, WhatsApp ou qualquer conta para enxergar a compra original, o prazo da garantia e todas as reposições ligadas.</div>';
+    return;
+  }
+  const matches = buildDashboardMatches(q);
+  if(!matches.length){
+    host.innerHTML = '<div class="empty">Nenhum resultado encontrado para essa busca.</div>';
+    return;
+  }
+  host.innerHTML = matches.map(s=>{
+    const c = customerById(s.customer_id);
+    const flag = resolveFlag(c);
+    const initial = accountById(s.initial_account_id);
+    const end = guaranteeEnd(s);
+    const d = daysLeft(end);
+    const reps = replacementsBySale(s.id);
+    const matchedReplacement = reps.find(r => {
+      const acc = accountById(r.replacement_account_id);
+      const hay = `${acc.label||''} ${acc.login||''}`.toLowerCase();
+      return hay.includes(q.toLowerCase());
+    });
+    const replacementNote = matchedReplacement ? `<div class="chip yellow" style="margin-bottom:10px">Busca bateu numa reposição entregue em ${fmtDate(matchedReplacement.replaced_at)} · vence em ${fmtDate(end)}</div>` : '';
+    const repsHtml = reps.length ? reps.map(r=>{ const a=accountById(r.replacement_account_id); return `<div class="item" style="padding:12px;margin-top:10px"><div class="item-title" style="font-size:.95rem">${a.login || a.label || 'Conta de reposição'}</div><div class="item-meta">Entregue ${fmtDate(r.replaced_at)}${r.reason ? ` · ${r.reason}` : ''}</div></div>`; }).join('') : '<div class="empty" style="margin-top:10px">Nenhuma reposição nessa compra.</div>';
+    return `<div class="item" style="padding:18px 18px 16px">
+      ${replacementNote}
+      <div class="item-head">
+        <div>
+          <div class="item-title" style="font-size:1.05rem">${c.name || 'Cliente'} - Contato ${c.whatsapp || 'sem número'} - ${flag} ${c.country_name || 'País não identificado'}</div>
+          <div class="item-meta" style="margin-top:8px">
+            <strong>${initial.login || initial.label || 'Conta original'}</strong> - ${s.warranty_days} dias de garantia - ${fmtDate(s.sold_at)} a ${fmtDate(end)} - ${d < 0 ? `Venceu há ${Math.abs(d)} dias` : `Faltam ${d} dias`}
+          </div>
+        </div>
+        <div>${badgeByDays(d)}</div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="eyebrow" style="font-size:.68rem">Reposições desta compra</div>
+        ${repsHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+function clearDashboardSearch(){ const el = $('dashboardSearch'); if(el){ el.value=''; renderDashboardSearch(); } }
 function renderManagerSummary(){
   const overdue = state.sales.filter(s => (daysLeft(guaranteeEnd(s)) ?? 1) < 0).length;
   const pt = state.customers.filter(c => String(c.language||'').toLowerCase().includes('portugu')).length;
