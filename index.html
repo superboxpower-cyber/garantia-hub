@@ -564,8 +564,12 @@ function renderCustomers(){
   $('customersList').innerHTML = items || '<div class="empty">Nenhum cliente cadastrado.</div>';
 }
 function renderAccounts(){
-  const q = val('accountSearch').toLowerCase();
-  const items = state.accounts.filter(a=>`${a.label||''} ${a.login||''} ${a.provider||''}`.toLowerCase().includes(q)).map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.label || a.login || 'Conta'}</div><div class="item-meta">${a.login || 'Sem login'}<br>Fornecedor: ${a.provider || '—'}<br>Custo: ${money(a.acquisition_cost)} · adquirida em ${fmtDate(a.acquired_at)}</div></div><span class="chip ${a.status==='available'?'green':a.status==='blocked'?'red':'yellow'}">${translateAccountStatus(a.status)}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editAccount('${a.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','available')">Disponível</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','replaced')">Reposição</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','blocked')">Bloqueada</button><button class="btn btn-danger" onclick="deleteAccount('${a.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`).join('');
+  const raw = $('accountSearch') ? $('accountSearch').value : '';
+  const q = String(raw || '').trim().toLowerCase();
+  const filtered = !q
+    ? [...state.accounts]
+    : state.accounts.filter(a=>`${a.label||''} ${a.login||''} ${a.provider||''}`.toLowerCase().includes(q));
+  const items = filtered.map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.label || a.login || 'Conta'}</div><div class="item-meta">${a.login || 'Sem login'}<br>Fornecedor: ${a.provider || '—'}<br>Custo: ${money(a.acquisition_cost)} · adquirida em ${fmtDate(a.acquired_at)}</div></div><span class="chip ${a.status==='available'?'green':a.status==='blocked'?'red':'yellow'}">${translateAccountStatus(a.status)}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editAccount('${a.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','available')">Disponível</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','replaced')">Reposição</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','blocked')">Bloqueada</button><button class="btn btn-danger" onclick="deleteAccount('${a.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`).join('');
   $('accountsList').innerHTML = items || '<div class="empty">Nenhuma conta cadastrada.</div>';
 }
 function renderSales(){
@@ -586,7 +590,15 @@ function renderReplacements(){
   }).join('');
   $('replacementsList').innerHTML = items || '<div class="empty">Nenhuma reposição registrada.</div>';
 }
-function switchTab(name){ document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden')); $('tab-'+name).classList.remove('hidden'); document.querySelectorAll('.side-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab===name)); }
+function switchTab(name){
+  document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden'));
+  $('tab-'+name).classList.remove('hidden');
+  document.querySelectorAll('.side-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab===name));
+  if(name === 'accounts') renderAccounts();
+  if(name === 'customers') renderCustomers();
+  if(name === 'sales') renderSales();
+  if(name === 'dashboard') renderDashboardSearch();
+}
 function resetCustomerForm(){ $('customer_id').value=''; $('customer_name').value=''; $('customer_whatsapp').value=''; $('customer_notes').value=''; $('customerFormTitle').textContent='Novo cliente'; $('customerSaveBtn').textContent='Salvar cliente'; $('cancelCustomerEditBtn').classList.add('hidden'); resetGeoCard(); }
 function resetAccountForm(){ $('account_id').value=''; ['account_label','account_login','account_password','account_provider','account_cost','account_acquired_at','account_notes'].forEach(id=>$(id).value=''); $('accountFormTitle').textContent='Nova conta'; $('accountSaveBtn').textContent='Salvar conta'; $('cancelAccountEditBtn').classList.add('hidden'); }
 function resetSaleForm(){ $('sale_id').value=''; $('sale_customer_id').value=''; $('sale_initial_account_id').value=''; $('sale_sold_at').value=''; $('sale_warranty_days').value='30'; $('sale_price').value=''; $('sale_status').value='active'; $('sale_notes').value=''; $('saleFormTitle').textContent='Registrar venda inicial'; $('saleSaveBtn').textContent='Salvar venda'; $('cancelSaleEditBtn').classList.add('hidden'); }
