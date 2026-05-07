@@ -316,9 +316,15 @@ const SUPABASE_URL = 'https://epwmoicgvuprzkcpxjoy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues';
 const APP_PIN = '5425';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{persistSession:false,autoRefreshToken:false} });
+const LANG_PREF_VERSION = 'urdu-default-v2';
 const savedLang = localStorage.getItem('garantia_hub_lang');
 const savedLangManual = localStorage.getItem('garantia_hub_lang_manual') === '1';
-const state = { customers: [], accounts: [], sales: [], replacements: [], supportsCustomerGeo: false, language: savedLangManual && savedLang ? savedLang : 'ur-PK' };
+const savedLangVersion = localStorage.getItem('garantia_hub_lang_version');
+if(!savedLangManual || savedLangVersion !== LANG_PREF_VERSION){
+  localStorage.setItem('garantia_hub_lang', 'ur-PK');
+  localStorage.removeItem('garantia_hub_lang_manual');
+}
+const state = { customers: [], accounts: [], sales: [], replacements: [], supportsCustomerGeo: false, language: savedLangManual && savedLang && savedLangVersion === LANG_PREF_VERSION ? savedLang : 'ur-PK' };
 const I18N = {
   'pt-BR': {
     loginEyebrow:'Painel operacional', loginTitle:'Central de Garantias', loginSubtitle:'Controle de garantias, contas e vendas', loginPinPlaceholder:'PIN de acesso', loginBtn:'Entrar', loginInvalid:'PIN inválido.',
@@ -435,7 +441,7 @@ function applyLanguage(){
   refreshSaleStatusOptions();
   renderKpis(); renderDashboard(); renderManagerSummary(); renderDashboardSearch(); renderCustomers(); renderAccounts(); renderSales();
 }
-function setLanguage(lang){ state.language = lang; localStorage.setItem('garantia_hub_lang', lang); localStorage.setItem('garantia_hub_lang_manual', '1'); applyLanguage(); }
+function setLanguage(lang){ state.language = lang; localStorage.setItem('garantia_hub_lang', lang); localStorage.setItem('garantia_hub_lang_manual', '1'); localStorage.setItem('garantia_hub_lang_version', LANG_PREF_VERSION); applyLanguage(); }
 function money(v){ return new Intl.NumberFormat(state.language === 'ur-PK' ? 'ur-PK' : 'pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
 function fmtDate(v){ if(!v) return '—'; const d=new Date(v+'T12:00:00'); return d.toLocaleDateString(state.language === 'ur-PK' ? 'ur-PK' : 'pt-BR'); }
 function addDays(dateStr, days){ const d=new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+Number(days||0)); return d; }
@@ -511,12 +517,13 @@ async function loadAll(){
   } catch(err){ fail(err); }
 }
 function fillSelectors(){
-  $('sale_customer_id').innerHTML = [`<option value="">${tr('optionSelectCustomer')}</option>`].concat(state.customers.map(c=>`<option value="${c.id}">${c.name}${c.whatsapp ? ' · '+c.whatsapp : ''}</option>`)).join('');
+  if($('sale_customer_id')) $('sale_customer_id').innerHTML = [`<option value="">${tr('optionSelectCustomer')}</option>`].concat(state.customers.map(c=>`<option value="${c.id}">${c.name}${c.whatsapp ? ' · '+c.whatsapp : ''}</option>`)).join('');
   const accOptions = [`<option value="">${tr('optionSelectAccount')}</option>`].concat(state.accounts.map(a=>`<option value="${a.id}">${a.label || a.login || tr('commonCustomer')} · ${translateAccountStatus(a.status)}</option>`)).join('');
-  $('sale_initial_account_id').innerHTML = accOptions; $('replacement_account_id').innerHTML = accOptions;
-  $('replacement_sale_id').innerHTML = [`<option value="">${tr('optionSelectSale')}</option>`].concat(state.sales.map(s=>{ const c=customerById(s.customer_id); return `<option value="${s.id}">${c.name || tr('commonCustomer')} · ${fmtDate(s.sold_at)} · ${guaranteeEnd(s)}</option>`; })).join('');
+  if($('sale_initial_account_id')) $('sale_initial_account_id').innerHTML = accOptions;
+  if($('replacement_account_id')) $('replacement_account_id').innerHTML = accOptions;
+  if($('replacement_sale_id')) $('replacement_sale_id').innerHTML = [`<option value="">${tr('optionSelectSale')}</option>`].concat(state.sales.map(s=>{ const c=customerById(s.customer_id); return `<option value="${s.id}">${c.name || tr('commonCustomer')} · ${fmtDate(s.sold_at)} · ${guaranteeEnd(s)}</option>`; })).join('');
 }
-function renderAll(){ renderKpis(); renderDashboard(); renderCustomers(); renderAccounts(); renderSales(); renderReplacements(); renderManagerSummary(); renderDashboardSearch(); }
+function renderAll(){ renderKpis(); renderDashboard(); renderCustomers(); renderAccounts(); renderSales(); renderManagerSummary(); renderDashboardSearch(); }
 function renderKpis(){
   const active = state.sales.filter(s => (daysLeft(guaranteeEnd(s)) ?? -999) >= 0).length;
   const expiring = state.sales.filter(s => { const d=daysLeft(guaranteeEnd(s)); return d!==null && d>=0 && d<=3; }).length;
@@ -652,11 +659,13 @@ function renderSales(){
   $('salesList').innerHTML = items || `<div class="empty">${tr('commonNoSales')}</div>`;
 }
 function renderReplacements(){
+  const host = $('replacementsList');
+  if(!host) return;
   const items = state.replacements.map(r=>{
-    const sale = state.sales.find(s=>s.id===r.sale_id) || {}, c=customerById(sale.customer_id), a=accountById(r.replacement_account_id), end=guaranteeEnd(sale), d=daysLeft(end);
-    return `<div class="item"><div class="item-head"><div><div class="item-title">${c.name || 'Cliente'}</div><div class="item-meta">Reposição em ${fmtDate(r.replaced_at)} · Conta: ${a.label || a.login || '—'}<br>Motivo: ${r.reason || '—'}<br>Garantia original até ${fmtDate(end)} (${d<0?'vencida':'restam '+d+'d'})</div></div><span class="chip blue">Reposição</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editReplacement('${r.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-danger" onclick="deleteReplacement('${r.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`;
+    const sale = state.sales.find(s=>s.id===r.sale_id) || {}, c=customerById(sale.customer_id), a=accountById(r.replacement_account_id), end=guaranteeEnd(sale);
+    return `<div class="item"><div class="item-head"><div><div class="item-title">${c.name || tr('commonCustomer')}</div><div class="item-meta">${tr('tableReplacement')} ${fmtDate(r.replaced_at)} · ${tr('commonCurrentAccount')}: ${a.label || a.login || '—'}<br>${tr('commonReason')}: ${r.reason || '—'}<br>${tr('commonOriginalWarrantyUntil')} ${fmtDate(end)}</div></div><span class="chip blue">${tr('tableReplacement')}</span></div></div>`;
   }).join('');
-  $('replacementsList').innerHTML = items || '<div class="empty">Nenhuma reposição registrada.</div>';
+  host.innerHTML = items || `<div class="empty">${tr('resultNoReplacements')}</div>`;
 }
 function switchTab(name){
   document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden'));
