@@ -100,17 +100,17 @@
         <div class="brand">
           <img src="https://i.postimg.cc/jjDs2bPw/Digita-LStore.png" alt="Logo">
           <div>
-            <div class="eyebrow">Painel operacional</div>
-            <div style="font-size:1.55rem;font-weight:900;letter-spacing:-.03em">Garantias</div>
+            <div class="eyebrow" id="sidebarEyebrow">Painel operacional</div>
+            <div id="sidebarTitle" style="font-size:1.55rem;font-weight:900;letter-spacing:-.03em">Garantias</div>
           </div>
         </div>
         <div class="side-nav">
-          <button class="side-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></button>
-          <button class="side-btn" data-tab="customers" onclick="switchTab('customers')"><i class="fa-solid fa-users"></i><span>Clientes</span></button>
-          <button class="side-btn" data-tab="accounts" onclick="switchTab('accounts')"><i class="fa-solid fa-key"></i><span>Contas</span></button>
-          <button class="side-btn" data-tab="sales" onclick="switchTab('sales')"><i class="fa-solid fa-cart-shopping"></i><span>Vendas</span></button>
+          <button class="side-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line"></i><span id="navDashboard">Dashboard</span></button>
+          <button class="side-btn" data-tab="customers" onclick="switchTab('customers')"><i class="fa-solid fa-users"></i><span id="navCustomers">Clientes</span></button>
+          <button class="side-btn" data-tab="accounts" onclick="switchTab('accounts')"><i class="fa-solid fa-key"></i><span id="navAccounts">Contas</span></button>
+          <button class="side-btn" data-tab="sales" onclick="switchTab('sales')"><i class="fa-solid fa-cart-shopping"></i><span id="navSales">Vendas</span></button>
         </div>
-        <div class="sidebar-note small">
+        <div class="sidebar-note small" id="sidebarNote">
           A garantia sempre segue a <strong>compra original</strong>. Reposição não reinicia prazo.
         </div>
       </aside>
@@ -118,12 +118,16 @@
       <main class="content">
         <section class="glass topbar">
           <div>
-            <div class="eyebrow">Central operacional</div>
-            <h1 class="title" style="margin-top:6px">Central de Garantias</h1>
+            <div class="eyebrow" id="topbarEyebrow">Central operacional</div>
+            <h1 class="title" id="topbarTitle" style="margin-top:6px">Central de Garantias</h1>
           </div>
           <div class="topbar-actions">
-            <button class="btn btn-secondary" onclick="loadAll()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
-            <button class="btn btn-secondary" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+            <select id="languageSelect" class="field" style="min-width:220px;padding:12px 14px" onchange="setLanguage(this.value)">
+              <option value="pt-BR">Português (Brasil)</option>
+              <option value="ur-PK">اردو (Paquistان)</option>
+            </select>
+            <button class="btn btn-secondary" onclick="loadAll()" id="refreshBtn"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
+            <button class="btn btn-secondary" onclick="logout()" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
           </div>
         </section>
 
@@ -135,13 +139,13 @@
               <div class="glass panel">
                 <div class="section-title">
                   <div>
-                    <h2>Busca operacional por cliente ou conta</h2>
-                    <p>Digite nome, WhatsApp, conta original ou conta de reposição.</p>
+                    <h2 id="dashSearchTitle">Busca operacional por cliente ou conta</h2>
+                    <p id="dashSearchSubtitle">Digite nome, WhatsApp, conta original ou conta de reposição.</p>
                   </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">
                   <input id="dashboardSearch" class="field" placeholder="Ex.: Túlio, 85987280047, conta03@gmail.com" oninput="renderDashboardSearch()">
-                  <button class="btn btn-secondary" onclick="clearDashboardSearch()"><i class="fa-solid fa-broom"></i> Limpar</button>
+                  <button class="btn btn-secondary" id="clearSearchBtn" onclick="clearDashboardSearch()"><i class="fa-solid fa-broom"></i> Limpar</button>
                 </div>
                 <div id="dashboardSearchResults" style="margin-top:14px"></div>
               </div>
@@ -267,10 +271,40 @@ const SUPABASE_URL = 'https://epwmoicgvuprzkcpxjoy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues';
 const APP_PIN = '5425';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{persistSession:false,autoRefreshToken:false} });
-const state = { customers: [], accounts: [], sales: [], replacements: [], supportsCustomerGeo: false };
+const state = { customers: [], accounts: [], sales: [], replacements: [], supportsCustomerGeo: false, language: localStorage.getItem('garantia_hub_lang') || 'pt-BR' };
+const I18N = {
+  'pt-BR': {
+    sidebarEyebrow:'Painel operacional', sidebarTitle:'Garantias', navDashboard:'Dashboard', navCustomers:'Clientes', navAccounts:'Contas', navSales:'Vendas',
+    sidebarNote:'A garantia sempre segue a <strong>compra original</strong>. Reposição não reinicia prazo.', topbarEyebrow:'Central operacional', topbarTitle:'Central de Garantias',
+    refreshBtn:'<i class="fa-solid fa-rotate-right"></i> Atualizar', logoutBtn:'<i class="fa-solid fa-right-from-bracket"></i> Sair',
+    dashSearchTitle:'Busca operacional por cliente ou conta', dashSearchSubtitle:'Digite nome, WhatsApp, conta original ou conta de reposição.',
+    dashboardSearchPlaceholder:'Ex.: Túlio, 85987280047, conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> Limpar'
+  },
+  'ur-PK': {
+    sidebarEyebrow:'آپریشنل پینل', sidebarTitle:'وارنٹیز', navDashboard:'ڈیش بورڈ', navCustomers:'گاہک', navAccounts:'اکاؤنٹس', navSales:'فروخت',
+    sidebarNote:'وارنٹی ہمیشہ <strong>اصل خریداری</strong> کے ساتھ جڑی رہتی ہے۔ متبادل سے مدت دوبارہ شروع نہیں ہوتی۔', topbarEyebrow:'آپریشنل مرکز', topbarTitle:'سینٹرل آف وارنٹیز',
+    refreshBtn:'<i class="fa-solid fa-rotate-right"></i> تازہ کریں', logoutBtn:'<i class="fa-solid fa-right-from-bracket"></i> باہر نکلیں',
+    dashSearchTitle:'گاہک یا اکاؤنٹ کے لحاظ سے تلاش', dashSearchSubtitle:'نام، واٹس ایپ، اصل اکاؤنٹ یا متبادل اکاؤنٹ لکھیں۔',
+    dashboardSearchPlaceholder:'مثال: Tulio، 85987280047، conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> صاف کریں'
+  }
+};
 
 const $ = id => document.getElementById(id);
 function toast(msg){ const el=$('toast'); el.textContent=msg; el.style.display='block'; clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>el.style.display='none',3200); }
+function applyLanguage(){
+  const t = I18N[state.language] || I18N['pt-BR'];
+  const textIds = ['sidebarEyebrow','sidebarTitle','navDashboard','navCustomers','navAccounts','navSales','topbarEyebrow','topbarTitle','dashSearchTitle','dashSearchSubtitle'];
+  textIds.forEach(id => { const el = $(id); if(el && t[id]) el.textContent = t[id]; });
+  if($('sidebarNote')) $('sidebarNote').innerHTML = t.sidebarNote;
+  if($('refreshBtn')) $('refreshBtn').innerHTML = t.refreshBtn;
+  if($('logoutBtn')) $('logoutBtn').innerHTML = t.logoutBtn;
+  if($('clearSearchBtn')) $('clearSearchBtn').innerHTML = t.clearSearchBtn;
+  if($('dashboardSearch')) $('dashboardSearch').placeholder = t.dashboardSearchPlaceholder;
+  if($('languageSelect')) $('languageSelect').value = state.language;
+  document.documentElement.lang = state.language === 'ur-PK' ? 'ur' : 'pt-BR';
+  document.body.dir = state.language === 'ur-PK' ? 'rtl' : 'ltr';
+}
+function setLanguage(lang){ state.language = lang; localStorage.setItem('garantia_hub_lang', lang); applyLanguage(); }
 function money(v){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
 function fmtDate(v){ if(!v) return '—'; const d=new Date(v+'T12:00:00'); return d.toLocaleDateString('pt-BR'); }
 function addDays(dateStr, days){ const d=new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+Number(days||0)); return d; }
@@ -554,6 +588,7 @@ async function deleteSale(id){ if(!confirm('Excluir esta venda?')) return; const
 async function deleteReplacement(id){ if(!confirm('Excluir esta reposição?')) return; const { error } = await sb.from('warranty_replacements').delete().eq('id', id); if(error) return fail(error); resetReplacementForm(); toast('Reposição excluída.'); await loadAll(); }
 function unlockApp(){ if($('pinInput').value !== APP_PIN) return toast('PIN inválido.'); localStorage.setItem('warranty_hub_ok','1'); $('loginView').classList.add('hidden'); $('appView').classList.remove('hidden'); loadAll(); }
 function logout(){ localStorage.removeItem('warranty_hub_ok'); location.reload(); }
+applyLanguage();
 if(localStorage.getItem('warranty_hub_ok')==='1'){ $('loginView').classList.add('hidden'); $('appView').classList.remove('hidden'); loadAll(); }
 </script>
 </body>
