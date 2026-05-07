@@ -222,7 +222,7 @@
               <div class="section-title">
                 <div>
                   <h2 id="customerFormTitle">Novo cliente</h2>
-                  <p>Cadastro rápido com país detectado pelo WhatsApp.</p>
+                  <p id="customerFormSubtitle">Cadastro rápido com país detectado pelo WhatsApp.</p>
                 </div>
                 <button class="btn btn-secondary hidden" id="cancelCustomerEditBtn" onclick="resetCustomerForm()">Cancelar edição</button>
               </div>
@@ -242,7 +242,7 @@
               </div>
             </div>
             <div class="glass panel">
-              <div class="section-title"><div><h2>Clientes cadastrados</h2><p>Busca, edição e histórico rápido.</p></div></div>
+              <div class="section-title"><div><h2 data-i18n-customer-list-title>Clientes cadastrados</h2><p data-i18n-customer-list-subtitle>Busca, edição e histórico rápido.</p></div></div>
               <div style="margin-bottom:12px"><input id="customerSearch" class="field" placeholder="Buscar por nome, WhatsApp, país ou idioma" oninput="renderCustomers()"></div>
               <div id="customersList" class="list"></div>
             </div>
@@ -253,7 +253,7 @@
           <div class="grid-2">
             <div class="glass panel">
               <div class="section-title">
-                <div><h2 id="accountFormTitle">Nova conta</h2><p>Controle de estoque e origem das contas.</p></div>
+                <div><h2 id="accountFormTitle">Nova conta</h2><p id="accountFormSubtitle">Controle de estoque e origem das contas.</p></div>
                 <button class="btn btn-secondary hidden" id="cancelAccountEditBtn" onclick="resetAccountForm()">Cancelar edição</button>
               </div>
               <div class="form-grid" autocomplete="off">
@@ -264,13 +264,13 @@
                 <input id="account_provider" class="field" placeholder="Fornecedor / origem" autocomplete="off">
                 <input id="account_cost" class="field" type="number" step="0.01" placeholder="Custo (R$)">
                 <input id="account_acquired_at" class="field" type="date">
-                <div class="item" style="padding:12px 14px;background:rgba(73,168,255,.06);border-color:rgba(73,168,255,.14)"><div class="item-title" style="font-size:.92rem">Status inicial automático</div><div class="item-meta">Toda conta nova entra como <strong>disponível</strong>. Depois, no estoque, ele pode mudar para <strong>bloqueada</strong> ou <strong>reposição</strong>. Ao vender, o sistema marca como <strong>vendida</strong> automaticamente.</div></div>
+                <div class="item" style="padding:12px 14px;background:rgba(73,168,255,.06);border-color:rgba(73,168,255,.14)"><div class="item-title" data-i18n-account-auto-title style="font-size:.92rem">Status inicial automático</div><div class="item-meta" data-i18n-account-auto-body>Toda conta nova entra como <strong>disponível</strong>. Depois, no estoque, ele pode mudar para <strong>bloqueada</strong> ou <strong>reposição</strong>. Ao vender, o sistema marca como <strong>vendida</strong> automaticamente.</div></div>
                 <textarea id="account_notes" class="full" rows="4" placeholder="Observações"></textarea>
                 <button class="btn btn-primary full" onclick="saveAccount()" id="accountSaveBtn">Salvar conta</button>
               </div>
             </div>
             <div class="glass panel">
-              <div class="section-title"><div><h2>Estoque de contas</h2><p>Editar rápido e localizar origem.</p></div></div>
+              <div class="section-title"><div><h2 data-i18n-account-list-title>Estoque de contas</h2><p data-i18n-account-list-subtitle>Editar rápido e localizar origem.</p></div></div>
               <div style="margin-bottom:12px"><input id="accountSearch" class="field" placeholder="Buscar por login, nome ou fornecedor" oninput="renderAccounts()"></div>
               <div id="accountsList" class="list"></div>
             </div>
@@ -281,7 +281,7 @@
           <div class="grid-2">
             <div class="glass panel">
               <div class="section-title">
-                <div><h2 id="saleFormTitle">Registrar venda inicial</h2><p>Compra original que governa todo o prazo da garantia.</p></div>
+                <div><h2 id="saleFormTitle">Registrar venda inicial</h2><p id="saleFormSubtitle">Compra original que governa todo o prazo da garantia.</p></div>
                 <button class="btn btn-secondary hidden" id="cancelSaleEditBtn" onclick="resetSaleForm()">Cancelar edição</button>
               </div>
               <div class="form-grid">
@@ -297,7 +297,7 @@
               </div>
             </div>
             <div class="glass panel">
-              <div class="section-title"><div><h2>Vendas cadastradas</h2><p>Editar ciclo, prazo e conta inicial.</p></div></div>
+              <div class="section-title"><div><h2 data-i18n-sale-list-title>Vendas cadastradas</h2><p data-i18n-sale-list-subtitle>Editar ciclo, prazo e conta inicial.</p></div></div>
               <div style="margin-bottom:12px"><input id="salesSearch" class="field" placeholder="Buscar por cliente, login ou status" oninput="renderSales()"></div>
               <div id="salesList" class="list"></div>
             </div>
@@ -325,13 +325,21 @@ const I18N = {
     dashboardSearchPlaceholder:'Ex.: Túlio, 85987280047, conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> Limpar',
     alertsTitle:'Alertas operacionais', alertsSubtitle:'O que merece atenção agora.', summaryTitle:'Resumo gerencial', summarySubtitle:'Indicadores rápidos de operação.',
     activeWarrantyTitle:'Garantias ativas e vencimentos', activeWarrantySubtitle:'Visão rápida para agir antes do cliente cobrar.',
+    customerFormTitle:'Novo cliente', customerFormSubtitle:'Cadastro rápido com país detectado pelo WhatsApp.', customerCancelEdit:'Cancelar edição', customerNamePh:'Nome do cliente', customerWhatsappPh:'WhatsApp', customerGeoUnknown:'País não identificado', customerGeoHint:'Preencha o WhatsApp com código do país.', customerNotesPh:'Observações', customerSave:'Salvar cliente', customerEditSave:'Salvar alterações',
+    customerListTitle:'Clientes cadastrados', customerListSubtitle:'Busca, edição e histórico rápido.', customerSearchPh:'Buscar por nome, WhatsApp, país ou idioma',
+    accountFormTitle:'Nova conta', accountFormSubtitle:'Controle de estoque e origem das contas.', accountCancelEdit:'Cancelar edição', accountLabelPh:'Nome interno da conta', accountLoginPh:'Login / e-mail', accountPasswordPh:'Senha', accountProviderPh:'Fornecedor / origem', accountCostPh:'Custo (R$)', accountAutoTitle:'Status inicial automático', accountAutoBody:'Toda conta nova entra como <strong>disponível</strong>. Depois, no estoque, ele pode mudar para <strong>bloqueada</strong> ou <strong>reposição</strong>. Ao vender, o sistema marca como <strong>vendida</strong> automaticamente.', accountNotesPh:'Observações', accountSave:'Salvar conta', accountEditSave:'Salvar alterações',
+    accountListTitle:'Estoque de contas', accountListSubtitle:'Editar rápido e localizar origem.', accountSearchPh:'Buscar por login, nome ou fornecedor',
+    saleFormTitle:'Registrar venda inicial', saleFormSubtitle:'Compra original que governa todo o prazo da garantia.', saleCancelEdit:'Cancelar edição', saleWarrantyPh:'Dias de garantia', salePricePh:'Preço de venda (R$)', saleNotesPh:'Observações da venda', saleSave:'Salvar venda', saleEditSave:'Salvar alterações', saleListTitle:'Vendas cadastradas', saleListSubtitle:'Editar ciclo, prazo e conta inicial.', saleSearchPh:'Buscar por cliente, login ou status',
     kpiActive:'Garantias ativas', kpiActiveFoot:'Compras ainda dentro do prazo original', kpiExpiring:'Vencendo em 3 dias', kpiExpiringFoot:'Clientes que exigem atenção imediata',
     kpiAvailable:'Contas disponíveis', kpiAvailableFoot:'Estoque pronto para novas vendas ou trocas', kpiReplacements:'Reposições registradas', kpiReplacementsFoot:'Histórico acumulado de trocas',
     alertSoonSuffix:'perto do vencimento', alertSoonBody:'Garantia vence em {days} dia(s).', alertManySuffix:'com muitas reposições', alertManyBody:'Já recebeu {count} troca(s). Vale revisar qualidade/uso.',
     allGoodTitle:'Tudo sob controle', allGoodBody:'Nenhum alerta crítico agora.', chipAttention:'Atenção', chipCritical:'Crítico', chipOk:'Ok',
     summaryOverdue:'Garantias vencidas', summaryOverdueBody:'{count} registro(s) já passaram do prazo original.', summaryBase:'Base principal', summaryBaseBody:'{count} cliente(s) atualmente detectados em português.', summaryPressure:'Maior pressão de trocas', summaryPressureEmpty:'Sem dados suficientes ainda.', summaryPressureBody:'{name} com {count} reposição(ões).',
     emptySearch:'Busque por cliente, WhatsApp ou qualquer conta para enxergar a compra original, o prazo da garantia e todas as reposições ligadas.', emptyNoResult:'Nenhum resultado encontrado para essa busca.',
-    resultContact:'Contato', resultCountryFallback:'País não identificado', resultOriginal:'Conta original', resultWarrantyDays:'dias de garantia', resultRemaining:'Faltam {days} dias', resultExpired:'Venceu há {days} dias', resultReplacements:'Reposições desta compra', resultNoReplacements:'Nenhuma reposição nessa compra.', resultMatchedReplacement:'Busca bateu numa reposição entregue em {date} · vence em {end}'
+    resultContact:'Contato', resultCountryFallback:'País não identificado', resultOriginal:'Conta original', resultWarrantyDays:'dias de garantia', resultRemaining:'Faltam {days} dias', resultExpired:'Venceu há {days} dias', resultReplacements:'Reposições desta compra', resultNoReplacements:'Nenhuma reposição nessa compra.', resultMatchedReplacement:'Busca bateu numa reposição entregue em {date} · vence em {end}',
+    commonNoData:'Sem dados', commonNoWhatsapp:'Sem WhatsApp', commonNoLogin:'Sem login', commonProvider:'Fornecedor', commonCost:'Custo', commonAcquired:'adquirida em', commonEdit:'Editar', commonDelete:'Excluir', commonAvailable:'Disponível', commonReplacement:'Reposição', commonBlocked:'Bloqueada', commonCustomer:'Cliente', commonPurchase:'Compra', commonWarranty:'Garantia', commonPrice:'Preço', commonCurrentAccount:'Conta atual', commonInitialAccount:'Conta inicial', commonReason:'Motivo', commonOriginalWarrantyUntil:'Garantia original até', commonRemainShort:'restam {days}d', commonExpiredShort:'vencida', commonNoCustomers:'Nenhum cliente cadastrado.', commonNoAccounts:'Nenhuma conta cadastrada.', commonNoSales:'Nenhuma venda registrada.', commonNoRows:'Sem vendas ainda.',
+    optionSelectCustomer:'Selecione o cliente', optionSelectAccount:'Selecione a conta', optionSelectSale:'Selecione a venda', statusActive:'Ativa', statusExpired:'Expirada', statusCancelled:'Cancelada', badgeNoDate:'Sem data', badgeExpired:'Vencida há {days}d', badgeSoon:'Vence em {days}d', badgeActive:'Ativa · {days}d'
+  },
   },
   'ur-PK': {
     sidebarEyebrow:'آپریشنل پینل', sidebarTitle:'وارنٹیز', navDashboard:'ڈیش بورڈ', navCustomers:'گاہک', navAccounts:'اکاؤنٹس', navSales:'فروخت',
@@ -341,13 +349,21 @@ const I18N = {
     dashboardSearchPlaceholder:'مثال: Tulio، 85987280047، conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> صاف کریں',
     alertsTitle:'آپریشنل الرٹس', alertsSubtitle:'ابھی کس چیز پر توجہ دینی ہے۔', summaryTitle:'انتظامی خلاصہ', summarySubtitle:'آپریشن کے فوری اشارے۔',
     activeWarrantyTitle:'فعال وارنٹیز اور اختتامی تاریخیں', activeWarrantySubtitle:'گاہک کے پوچھنے سے پہلے فوری نظر۔',
+    customerFormTitle:'نیا گاہک', customerFormSubtitle:'واٹس ایپ سے ملک شناخت کے ساتھ تیز اندراج۔', customerCancelEdit:'ترمیم منسوخ کریں', customerNamePh:'گاہک کا نام', customerWhatsappPh:'واٹس ایپ', customerGeoUnknown:'ملک شناخت نہیں ہوا', customerGeoHint:'ملک کوڈ کے ساتھ واٹس ایپ درج کریں۔', customerNotesPh:'نوٹس', customerSave:'گاہک محفوظ کریں', customerEditSave:'تبدیلیاں محفوظ کریں',
+    customerListTitle:'رجسٹر شدہ گاہک', customerListSubtitle:'تلاش، ترمیم اور فوری ہسٹری۔', customerSearchPh:'نام، واٹس ایپ، ملک یا زبان سے تلاش کریں',
+    accountFormTitle:'نیا اکاؤنٹ', accountFormSubtitle:'اسٹاک اور اکاؤنٹ کے ماخذ کا کنٹرول۔', accountCancelEdit:'ترمیم منسوخ کریں', accountLabelPh:'اکاؤنٹ کا اندرونی نام', accountLoginPh:'لاگ اِن / ای میل', accountPasswordPh:'پاس ورڈ', accountProviderPh:'فراہم کنندہ / ماخذ', accountCostPh:'لاگت (Rs)', accountAutoTitle:'ابتدائی اسٹیٹس خودکار', accountAutoBody:'ہر نیا اکاؤنٹ <strong>دستیاب</strong> کے طور پر داخل ہوتا ہے۔ بعد میں اسٹاک میں اسے <strong>بلاک</strong> یا <strong>متبادل</strong> کیا جا سکتا ہے۔ فروخت پر سسٹم اسے خودکار طور پر <strong>فروخت شدہ</strong> کر دیتا ہے۔', accountNotesPh:'نوٹس', accountSave:'اکاؤنٹ محفوظ کریں', accountEditSave:'تبدیلیاں محفوظ کریں',
+    accountListTitle:'اکاؤنٹس کا اسٹاک', accountListSubtitle:'تیز ترمیم اور ماخذ تلاش کریں۔', accountSearchPh:'لاگ اِن، نام یا فراہم کنندہ سے تلاش کریں',
+    saleFormTitle:'ابتدائی فروخت درج کریں', saleFormSubtitle:'اصل خریداری ہی پوری وارنٹی مدت کو کنٹرول کرتی ہے۔', saleCancelEdit:'ترمیم منسوخ کریں', saleWarrantyPh:'وارنٹی کے دن', salePricePh:'فروخت کی قیمت (Rs)', saleNotesPh:'فروخت کے نوٹس', saleSave:'فروخت محفوظ کریں', saleEditSave:'تبدیلیاں محفوظ کریں', saleListTitle:'رجسٹر شدہ فروخت', saleListSubtitle:'مدت، تاریخ اور اصل اکاؤنٹ میں ترمیم کریں۔', saleSearchPh:'گاہک، لاگ اِن یا اسٹیٹس سے تلاش کریں',
     kpiActive:'فعال وارنٹیز', kpiActiveFoot:'وہ خریداری جو اب بھی اصل مدت کے اندر ہے', kpiExpiring:'3 دن میں ختم ہونے والی', kpiExpiringFoot:'وہ گاہک جن پر فوری توجہ چاہیے',
     kpiAvailable:'دستیاب اکاؤنٹس', kpiAvailableFoot:'نئی فروخت یا تبدیلی کے لیے تیار اسٹاک', kpiReplacements:'رجسٹر شدہ متبادل', kpiReplacementsFoot:'متبادلوں کی مجموعی ہسٹری',
     alertSoonSuffix:'جلد ختم ہونے والی', alertSoonBody:'وارنٹی {days} دن میں ختم ہوگی۔', alertManySuffix:'بہت زیادہ متبادل کے ساتھ', alertManyBody:'اسے پہلے ہی {count} تبدیلیاں مل چکی ہیں۔ معیار یا استعمال دیکھیں۔',
     allGoodTitle:'سب کنٹرول میں ہے', allGoodBody:'اس وقت کوئی اہم الرٹ نہیں۔', chipAttention:'توجہ', chipCritical:'اہم', chipOk:'ٹھیک',
     summaryOverdue:'ختم شدہ وارنٹیز', summaryOverdueBody:'{count} ریکارڈ اصل مدت سے گزر چکے ہیں۔', summaryBase:'بنیادی بیس', summaryBaseBody:'اس وقت {count} گاہک پرتگالی میں شناخت ہوئے ہیں۔', summaryPressure:'سب سے زیادہ تبدیلی کا دباؤ', summaryPressureEmpty:'ابھی کافی ڈیٹا نہیں۔', summaryPressureBody:'{name} کے ساتھ {count} متبادل۔',
     emptySearch:'گاہک، واٹس ایپ یا کوئی بھی اکاؤنٹ تلاش کریں تاکہ اصل خریداری، وارنٹی کی مدت اور جڑی ہوئی تمام تبدیلیاں دیکھی جا سکیں۔', emptyNoResult:'اس تلاش کے لیے کوئی نتیجہ نہیں ملا۔',
-    resultContact:'رابطہ', resultCountryFallback:'ملک شناخت نہیں ہوا', resultOriginal:'اصل اکاؤنٹ', resultWarrantyDays:'دن کی وارنٹی', resultRemaining:'{days} دن باقی ہیں', resultExpired:'{days} دن پہلے ختم ہوئی', resultReplacements:'اس خریداری کے متبادل', resultNoReplacements:'اس خریداری میں کوئی متبادل نہیں۔', resultMatchedReplacement:'تلاش ایک متبادل سے ملی جو {date} کو دیا گیا تھا · اختتام {end}'
+    resultContact:'رابطہ', resultCountryFallback:'ملک شناخت نہیں ہوا', resultOriginal:'اصل اکاؤنٹ', resultWarrantyDays:'دن کی وارنٹی', resultRemaining:'{days} دن باقی ہیں', resultExpired:'{days} دن پہلے ختم ہوئی', resultReplacements:'اس خریداری کے متبادل', resultNoReplacements:'اس خریداری میں کوئی متبادل نہیں۔', resultMatchedReplacement:'تلاش ایک متبادل سے ملی جو {date} کو دیا گیا تھا · اختتام {end}',
+    commonNoData:'کوئی ڈیٹا نہیں', commonNoWhatsapp:'واٹس ایپ نہیں', commonNoLogin:'لاگ اِن نہیں', commonProvider:'فراہم کنندہ', commonCost:'لاگت', commonAcquired:'حاصل کی گئی', commonEdit:'ترمیم', commonDelete:'حذف', commonAvailable:'دستیاب', commonReplacement:'متبادل', commonBlocked:'بلاک', commonCustomer:'گاہک', commonPurchase:'خریداری', commonWarranty:'وارنٹی', commonPrice:'قیمت', commonCurrentAccount:'موجودہ اکاؤنٹ', commonInitialAccount:'اصل اکاؤنٹ', commonReason:'وجہ', commonOriginalWarrantyUntil:'اصل وارنٹی ختم ہونے کی تاریخ', commonRemainShort:'{days}دن باقی', commonExpiredShort:'ختم شدہ', commonNoCustomers:'کوئی گاہک درج نہیں۔', commonNoAccounts:'کوئی اکاؤنٹ درج نہیں۔', commonNoSales:'کوئی فروخت درج نہیں۔', commonNoRows:'ابھی کوئی فروخت نہیں۔',
+    optionSelectCustomer:'گاہک منتخب کریں', optionSelectAccount:'اکاؤنٹ منتخب کریں', optionSelectSale:'فروخت منتخب کریں', statusActive:'فعال', statusExpired:'ختم شدہ', statusCancelled:'منسوخ', badgeNoDate:'تاریخ نہیں', badgeExpired:'{days}دن پہلے ختم', badgeSoon:'{days}دن میں ختم', badgeActive:'فعال · {days}دن'
+  }
   }
 };
 
@@ -363,10 +379,48 @@ function applyLanguage(){
   if($('logoutBtn')) $('logoutBtn').innerHTML = t.logoutBtn;
   if($('clearSearchBtn')) $('clearSearchBtn').innerHTML = t.clearSearchBtn;
   if($('dashboardSearch')) $('dashboardSearch').placeholder = t.dashboardSearchPlaceholder;
-  if($('languageSelect')) $('languageSelect').value = state.language;
+  if($('customerFormTitle')) $('customerFormTitle').textContent = t.customerFormTitle;
+  if($('customerFormSubtitle')) $('customerFormSubtitle').textContent = t.customerFormSubtitle;
+  if($('cancelCustomerEditBtn')) $('cancelCustomerEditBtn').textContent = t.customerCancelEdit;
+  if($('customer_name')) $('customer_name').placeholder = t.customerNamePh;
+  if($('customer_whatsapp')) $('customer_whatsapp').placeholder = t.customerWhatsappPh;
+  if($('customerGeoTitle') && $('customerGeoCard').style.display !== 'flex') $('customerGeoTitle').textContent = t.customerGeoUnknown;
+  if($('customerGeoSubtitle') && $('customerGeoCard').style.display !== 'flex') $('customerGeoSubtitle').textContent = t.customerGeoHint;
+  if($('customer_notes')) $('customer_notes').placeholder = t.customerNotesPh;
+  if($('customerSaveBtn')) $('customerSaveBtn').textContent = val('customer_id') ? t.customerEditSave : t.customerSave;
+  if($('customerSearch')) $('customerSearch').placeholder = t.customerSearchPh;
+  if($('accountFormTitle')) $('accountFormTitle').textContent = t.accountFormTitle;
+  if($('accountFormSubtitle')) $('accountFormSubtitle').textContent = t.accountFormSubtitle;
+  if($('cancelAccountEditBtn')) $('cancelAccountEditBtn').textContent = t.accountCancelEdit;
+  if($('account_label')) $('account_label').placeholder = t.accountLabelPh;
+  if($('account_login')) $('account_login').placeholder = t.accountLoginPh;
+  if($('account_password')) $('account_password').placeholder = t.accountPasswordPh;
+  if($('account_provider')) $('account_provider').placeholder = t.accountProviderPh;
+  if($('account_cost')) $('account_cost').placeholder = t.accountCostPh;
+  const autoTitle=document.querySelector('[data-i18n-account-auto-title]'); if(autoTitle) autoTitle.textContent = t.accountAutoTitle;
+  const autoBody=document.querySelector('[data-i18n-account-auto-body]'); if(autoBody) autoBody.innerHTML = t.accountAutoBody;
+  if($('account_notes')) $('account_notes').placeholder = t.accountNotesPh;
+  if($('accountSaveBtn')) $('accountSaveBtn').textContent = val('account_id') ? t.accountEditSave : t.accountSave;
+  if($('accountSearch')) $('accountSearch').placeholder = t.accountSearchPh;
+  if($('saleFormTitle')) $('saleFormTitle').textContent = t.saleFormTitle;
+  if($('saleFormSubtitle')) $('saleFormSubtitle').textContent = t.saleFormSubtitle;
+  if($('cancelSaleEditBtn')) $('cancelSaleEditBtn').textContent = t.saleCancelEdit;
+  if($('sale_warranty_days')) $('sale_warranty_days').placeholder = t.saleWarrantyPh;
+  if($('sale_price')) $('sale_price').placeholder = t.salePricePh;
+  if($('sale_notes')) $('sale_notes').placeholder = t.saleNotesPh;
+  if($('saleSaveBtn')) $('saleSaveBtn').textContent = val('sale_id') ? t.saleEditSave : t.saleSave;
+  if($('salesSearch')) $('salesSearch').placeholder = t.saleSearchPh;
+  document.querySelectorAll('[data-i18n-customer-list-title]').forEach(el=>el.textContent=t.customerListTitle);
+  document.querySelectorAll('[data-i18n-customer-list-subtitle]').forEach(el=>el.textContent=t.customerListSubtitle);
+  document.querySelectorAll('[data-i18n-account-list-title]').forEach(el=>el.textContent=t.accountListTitle);
+  document.querySelectorAll('[data-i18n-account-list-subtitle]').forEach(el=>el.textContent=t.accountListSubtitle);
+  document.querySelectorAll('[data-i18n-sale-list-title]').forEach(el=>el.textContent=t.saleListTitle);
+  document.querySelectorAll('[data-i18n-sale-list-subtitle]').forEach(el=>el.textContent=t.saleListSubtitle);
   document.documentElement.lang = state.language === 'ur-PK' ? 'ur' : 'pt-BR';
   document.body.dir = state.language === 'ur-PK' ? 'rtl' : 'ltr';
-  renderKpis(); renderDashboard(); renderManagerSummary(); renderDashboardSearch();
+  if($('languageSelect')) $('languageSelect').value = state.language;
+  refreshSaleStatusOptions();
+  renderKpis(); renderDashboard(); renderManagerSummary(); renderDashboardSearch(); renderCustomers(); renderAccounts(); renderSales();
 }
 function setLanguage(lang){ state.language = lang; localStorage.setItem('garantia_hub_lang', lang); applyLanguage(); }
 function money(v){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
@@ -375,7 +429,7 @@ function addDays(dateStr, days){ const d=new Date(dateStr+'T12:00:00'); d.setDat
 function isoDate(d){ return d.toISOString().slice(0,10); }
 function guaranteeEnd(sale){ return sale?.sold_at ? isoDate(addDays(sale.sold_at, Number(sale.warranty_days||0))) : null; }
 function daysLeft(endDate){ if(!endDate) return null; const now=new Date(); now.setHours(0,0,0,0); const end=new Date(endDate+'T12:00:00'); return Math.ceil((end-now)/86400000); }
-function badgeByDays(n){ if(n===null) return '<span class="badge warn">Sem data</span>'; if(n<0) return `<span class="badge bad">Vencida há ${Math.abs(n)}d</span>`; if(n<=3) return `<span class="badge warn">Vence em ${n}d</span>`; return `<span class="badge ok">Ativa · ${n}d</span>`; }
+function badgeByDays(n){ if(n===null) return `<span class="badge warn">${tr('badgeNoDate')}</span>`; if(n<0) return `<span class="badge bad">${tr('badgeExpired',{days:Math.abs(n)})}</span>`; if(n<=3) return `<span class="badge warn">${tr('badgeSoon',{days:n})}</span>`; return `<span class="badge ok">${tr('badgeActive',{days:n})}</span>`; }
 function val(id){ return $(id).value.trim(); }
 function num(id){ const v=val(id); return v===''? null : Number(v); }
 function fail(error){ console.error(error); toast(error?.message || 'Erro no Supabase.'); }
@@ -444,10 +498,10 @@ async function loadAll(){
   } catch(err){ fail(err); }
 }
 function fillSelectors(){
-  $('sale_customer_id').innerHTML = ['<option value="">Selecione o cliente</option>'].concat(state.customers.map(c=>`<option value="${c.id}">${c.name}${c.whatsapp ? ' · '+c.whatsapp : ''}</option>`)).join('');
-  const accOptions = ['<option value="">Selecione a conta</option>'].concat(state.accounts.map(a=>`<option value="${a.id}">${a.label || a.login || 'Conta'} · ${a.status}</option>`)).join('');
+  $('sale_customer_id').innerHTML = [`<option value="">${tr('optionSelectCustomer')}</option>`].concat(state.customers.map(c=>`<option value="${c.id}">${c.name}${c.whatsapp ? ' · '+c.whatsapp : ''}</option>`)).join('');
+  const accOptions = [`<option value="">${tr('optionSelectAccount')}</option>`].concat(state.accounts.map(a=>`<option value="${a.id}">${a.label || a.login || tr('commonCustomer')} · ${translateAccountStatus(a.status)}</option>`)).join('');
   $('sale_initial_account_id').innerHTML = accOptions; $('replacement_account_id').innerHTML = accOptions;
-  $('replacement_sale_id').innerHTML = ['<option value="">Selecione a venda</option>'].concat(state.sales.map(s=>{ const c=customerById(s.customer_id); return `<option value="${s.id}">${c.name || 'Cliente'} · ${fmtDate(s.sold_at)} · ${guaranteeEnd(s)}</option>`; })).join('');
+  $('replacement_sale_id').innerHTML = [`<option value="">${tr('optionSelectSale')}</option>`].concat(state.sales.map(s=>{ const c=customerById(s.customer_id); return `<option value="${s.id}">${c.name || tr('commonCustomer')} · ${fmtDate(s.sold_at)} · ${guaranteeEnd(s)}</option>`; })).join('');
 }
 function renderAll(){ renderKpis(); renderDashboard(); renderCustomers(); renderAccounts(); renderSales(); renderReplacements(); renderManagerSummary(); renderDashboardSearch(); }
 function renderKpis(){
@@ -551,17 +605,17 @@ function renderManagerSummary(){
 function renderSalesTable(){
   const rows = [...state.sales].sort((a,b)=>String(a.sold_at).localeCompare(String(b.sold_at))).reverse().map(s=>{
     const c=customerById(s.customer_id), acc=accountById(currentAccountForSale(s)), end=guaranteeEnd(s), d=daysLeft(end), reps=replacementsBySale(s.id).length;
-    return `<tr><td><strong>${c.name || '—'}</strong><div class="small" style="color:var(--muted)">${c.whatsapp || 'Sem WhatsApp'}</div></td><td>${acc.label || acc.login || '—'}</td><td>${fmtDate(s.sold_at)}</td><td>${fmtDate(end)}</td><td>${badgeByDays(d)}</td><td>${reps}</td></tr>`;
+    return `<tr><td><strong>${c.name || '—'}</strong><div class="small" style="color:var(--muted)">${c.whatsapp || tr('commonNoWhatsapp')}</div></td><td>${acc.label || acc.login || '—'}</td><td>${fmtDate(s.sold_at)}</td><td>${fmtDate(end)}</td><td>${badgeByDays(d)}</td><td>${reps}</td></tr>`;
   }).join('');
-  $('salesTableWrap').innerHTML = `<table><thead><tr><th>Cliente</th><th>Conta atual</th><th>Compra</th><th>Garantia até</th><th>Status</th><th>Reposições</th></tr></thead><tbody>${rows || '<tr><td colspan="6"><div class="empty">Sem vendas ainda.</div></td></tr>'}</tbody></table>`;
+  $('salesTableWrap').innerHTML = `<table><thead><tr><th>${tr('commonCustomer')}</th><th>${tr('commonCurrentAccount')}</th><th>${tr('commonPurchase')}</th><th>${tr('commonOriginalWarrantyUntil')}</th><th>${tr('statusActive')}</th><th>${tr('commonReplacement')}</th></tr></thead><tbody>${rows || `<tr><td colspan="6"><div class="empty">${tr('commonNoRows')}</div></td></tr>`}</tbody></table>`;
 }
 function renderCustomers(){
   const q = val('customerSearch').toLowerCase();
   const items = state.customers.filter(c=>`${c.name} ${c.whatsapp||''} ${c.country_name||''} ${c.language||''}`.toLowerCase().includes(q)).map(c=>{
     const flag = resolveFlag(c), geo = c.country_name ? `${flag} ${c.country_name}${c.language ? ' · ' + c.language : ''}` : 'País não identificado';
-    return `<div class="item"><div class="item-head"><div><div class="item-title">${c.name}</div><div class="item-meta">${c.whatsapp || 'Sem WhatsApp'}<br>${geo}${c.notes ? `<br>${c.notes}` : ''}</div></div><span class="chip blue">Cliente</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editCustomer('${c.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-danger" onclick="deleteCustomer('${c.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`;
+    return `<div class="item"><div class="item-head"><div><div class="item-title">${c.name}</div><div class="item-meta">${c.whatsapp || tr('commonNoWhatsapp')}<br>${geo}${c.notes ? `<br>${c.notes}` : ''}</div></div><span class="chip blue">${tr('commonCustomer')}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editCustomer('${c.id}')"><i class="fa-solid fa-pen"></i> ${tr('commonEdit')}</button><button class="btn btn-danger" onclick="deleteCustomer('${c.id}')"><i class="fa-solid fa-trash"></i> ${tr('commonDelete')}</button></div></div>`;
   }).join('');
-  $('customersList').innerHTML = items || '<div class="empty">Nenhum cliente cadastrado.</div>';
+  $('customersList').innerHTML = items || `<div class="empty">${tr('commonNoCustomers')}</div>`;
 }
 function renderAccounts(){
   const raw = $('accountSearch') ? $('accountSearch').value : '';
@@ -569,8 +623,8 @@ function renderAccounts(){
   const filtered = !q
     ? [...state.accounts]
     : state.accounts.filter(a=>`${a.label||''} ${a.login||''} ${a.provider||''}`.toLowerCase().includes(q));
-  const items = filtered.map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.label || a.login || 'Conta'}</div><div class="item-meta">${a.login || 'Sem login'}<br>Fornecedor: ${a.provider || '—'}<br>Custo: ${money(a.acquisition_cost)} · adquirida em ${fmtDate(a.acquired_at)}</div></div><span class="chip ${a.status==='available'?'green':a.status==='blocked'?'red':'yellow'}">${translateAccountStatus(a.status)}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editAccount('${a.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','available')">Disponível</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','replaced')">Reposição</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','blocked')">Bloqueada</button><button class="btn btn-danger" onclick="deleteAccount('${a.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`).join('');
-  $('accountsList').innerHTML = items || '<div class="empty">Nenhuma conta cadastrada.</div>';
+  const items = filtered.map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.label || a.login || tr('commonCustomer')}</div><div class="item-meta">${a.login || tr('commonNoLogin')}<br>${tr('commonProvider')}: ${a.provider || '—'}<br>${tr('commonCost')}: ${money(a.acquisition_cost)} · ${tr('commonAcquired')} ${fmtDate(a.acquired_at)}</div></div><span class="chip ${a.status==='available'?'green':a.status==='blocked'?'red':'yellow'}">${translateAccountStatus(a.status)}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editAccount('${a.id}')"><i class="fa-solid fa-pen"></i> ${tr('commonEdit')}</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','available')">${tr('commonAvailable')}</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','replaced')">${tr('commonReplacement')}</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','blocked')">${tr('commonBlocked')}</button><button class="btn btn-danger" onclick="deleteAccount('${a.id}')"><i class="fa-solid fa-trash"></i> ${tr('commonDelete')}</button></div></div>`).join('');
+  $('accountsList').innerHTML = items || `<div class="empty">${tr('commonNoAccounts')}</div>`;
 }
 function renderSales(){
   const q = val('salesSearch').toLowerCase();
@@ -579,9 +633,9 @@ function renderSales(){
     return `${c.name||''} ${a.label||a.login||''} ${s.status||''}`.toLowerCase().includes(q);
   }).map(s=>{
     const c=customerById(s.customer_id), first=accountById(s.initial_account_id), current=accountById(currentAccountForSale(s)), end=guaranteeEnd(s), d=daysLeft(end), reps=replacementsBySale(s.id).length;
-    return `<div class="item"><div class="item-head"><div><div class="item-title">${c.name || 'Cliente'}</div><div class="item-meta">Compra: ${fmtDate(s.sold_at)} · Garantia: ${s.warranty_days} dias · Preço: ${money(s.sale_price)}<br>Conta inicial: ${first.label || first.login || '—'}<br>Conta atual: ${current.label || current.login || '—'} · Reposições: ${reps}</div></div><div>${badgeByDays(d)}</div></div><div class="item-actions"><button class="btn btn-secondary" onclick="editSale('${s.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-danger" onclick="deleteSale('${s.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`;
+    return `<div class="item"><div class="item-head"><div><div class="item-title">${c.name || tr('commonCustomer')}</div><div class="item-meta">${tr('commonPurchase')}: ${fmtDate(s.sold_at)} · ${tr('commonWarranty')}: ${s.warranty_days} ${tr('resultWarrantyDays')} · ${tr('commonPrice')}: ${money(s.sale_price)}<br>${tr('commonInitialAccount')}: ${first.label || first.login || '—'}<br>${tr('commonCurrentAccount')}: ${current.label || current.login || '—'} · ${tr('commonReplacement')}: ${reps}</div></div><div>${badgeByDays(d)}</div></div><div class="item-actions"><button class="btn btn-secondary" onclick="editSale('${s.id}')"><i class="fa-solid fa-pen"></i> ${tr('commonEdit')}</button><button class="btn btn-danger" onclick="deleteSale('${s.id}')"><i class="fa-solid fa-trash"></i> ${tr('commonDelete')}</button></div></div>`;
   }).join('');
-  $('salesList').innerHTML = items || '<div class="empty">Nenhuma venda registrada.</div>';
+  $('salesList').innerHTML = items || `<div class="empty">${tr('commonNoSales')}</div>`;
 }
 function renderReplacements(){
   const items = state.replacements.map(r=>{
@@ -599,10 +653,11 @@ function switchTab(name){
   if(name === 'sales') renderSales();
   if(name === 'dashboard') renderDashboardSearch();
 }
-function resetCustomerForm(){ $('customer_id').value=''; $('customer_name').value=''; $('customer_whatsapp').value=''; $('customer_notes').value=''; $('customerFormTitle').textContent='Novo cliente'; $('customerSaveBtn').textContent='Salvar cliente'; $('cancelCustomerEditBtn').classList.add('hidden'); resetGeoCard(); }
-function resetAccountForm(){ $('account_id').value=''; ['account_label','account_login','account_password','account_provider','account_cost','account_acquired_at','account_notes'].forEach(id=>$(id).value=''); $('accountFormTitle').textContent='Nova conta'; $('accountSaveBtn').textContent='Salvar conta'; $('cancelAccountEditBtn').classList.add('hidden'); }
-function resetSaleForm(){ $('sale_id').value=''; $('sale_customer_id').value=''; $('sale_initial_account_id').value=''; $('sale_sold_at').value=''; $('sale_warranty_days').value='30'; $('sale_price').value=''; $('sale_status').value='active'; $('sale_notes').value=''; $('saleFormTitle').textContent='Registrar venda inicial'; $('saleSaveBtn').textContent='Salvar venda'; $('cancelSaleEditBtn').classList.add('hidden'); }
-function resetReplacementForm(){ $('replacement_id').value=''; $('replacement_sale_id').value=''; $('replacement_account_id').value=''; $('replacement_replaced_at').value=''; $('replacement_reason').value=''; $('replacement_notes').value=''; $('replacementFormTitle').textContent='Registrar reposição'; $('replacementSaveBtn').textContent='Salvar reposição'; $('cancelReplacementEditBtn').classList.add('hidden'); }
+function refreshSaleStatusOptions(){ if(!$('sale_status')) return; $('sale_status').innerHTML = `<option value="active">${tr('statusActive')}</option><option value="expired">${tr('statusExpired')}</option><option value="cancelled">${tr('statusCancelled')}</option>`; }
+function resetCustomerForm(){ $('customer_id').value=''; $('customer_name').value=''; $('customer_whatsapp').value=''; $('customer_notes').value=''; $('customerFormTitle').textContent=tr('customerFormTitle'); $('customerSaveBtn').textContent=tr('customerSave'); $('cancelCustomerEditBtn').textContent=tr('customerCancelEdit'); $('cancelCustomerEditBtn').classList.add('hidden'); resetGeoCard(); }
+function resetAccountForm(){ $('account_id').value=''; ['account_label','account_login','account_password','account_provider','account_cost','account_acquired_at','account_notes'].forEach(id=>$(id).value=''); $('accountFormTitle').textContent=tr('accountFormTitle'); $('accountSaveBtn').textContent=tr('accountSave'); $('cancelAccountEditBtn').textContent=tr('accountCancelEdit'); $('cancelAccountEditBtn').classList.add('hidden'); }
+function resetSaleForm(){ $('sale_id').value=''; $('sale_customer_id').value=''; $('sale_initial_account_id').value=''; $('sale_sold_at').value=''; $('sale_warranty_days').value='30'; $('sale_price').value=''; refreshSaleStatusOptions(); $('sale_status').value='active'; $('sale_notes').value=''; $('saleFormTitle').textContent=tr('saleFormTitle'); $('saleSaveBtn').textContent=tr('saleSave'); $('cancelSaleEditBtn').textContent=tr('saleCancelEdit'); $('cancelSaleEditBtn').classList.add('hidden'); }
+function resetReplacementForm(){ $('replacement_id').value=''; $('replacement_sale_id').value=''; $('replacement_account_id').value=''; $('replacement_replaced_at').value=''; $('replacement_reason').value=''; $('replacement_notes').value=''; }
 async function saveCustomer(){
   const geo=detectCountryMeta(val('customer_whatsapp'));
   const payload = { name: val('customer_name'), whatsapp: val('customer_whatsapp'), notes: val('customer_notes') };
@@ -645,12 +700,12 @@ async function saveReplacement(){
   if(!id) await sb.from('warranty_accounts').update({ status:'replaced' }).eq('id', payload.replacement_account_id);
   resetReplacementForm(); toast(id ? 'Reposição atualizada.' : 'Reposição registrada.'); await loadAll();
 }
-function editCustomer(id){ const c=customerById(id); $('customer_id').value=c.id; $('customer_name').value=c.name||''; $('customer_whatsapp').value=c.whatsapp||''; $('customer_notes').value=c.notes||''; $('customerFormTitle').textContent='Editar cliente'; $('customerSaveBtn').textContent='Salvar alterações'; $('cancelCustomerEditBtn').classList.remove('hidden'); handleWhatsappInput(); switchTab('customers'); window.scrollTo({top:0,behavior:'smooth'}); }
-function editAccount(id){ const a=accountById(id); $('account_id').value=a.id; $('account_label').value=a.label||''; $('account_login').value=a.login||''; $('account_password').value=a.password||''; $('account_provider').value=a.provider||''; $('account_cost').value=a.acquisition_cost||''; $('account_acquired_at').value=a.acquired_at||''; $('account_notes').value=a.notes||''; $('accountFormTitle').textContent='Editar conta'; $('accountSaveBtn').textContent='Salvar alterações'; $('cancelAccountEditBtn').classList.remove('hidden'); switchTab('accounts'); window.scrollTo({top:0,behavior:'smooth'}); }
-function editSale(id){ const s=state.sales.find(x=>x.id===id); if(!s) return; $('sale_id').value=s.id; $('sale_customer_id').value=s.customer_id||''; $('sale_initial_account_id').value=s.initial_account_id||''; $('sale_sold_at').value=s.sold_at||''; $('sale_warranty_days').value=s.warranty_days||30; $('sale_price').value=s.sale_price||''; $('sale_status').value=s.status||'active'; $('sale_notes').value=s.notes||''; $('saleFormTitle').textContent='Editar venda'; $('saleSaveBtn').textContent='Salvar alterações'; $('cancelSaleEditBtn').classList.remove('hidden'); switchTab('sales'); window.scrollTo({top:0,behavior:'smooth'}); }
+function editCustomer(id){ const c=customerById(id); $('customer_id').value=c.id; $('customer_name').value=c.name||''; $('customer_whatsapp').value=c.whatsapp||''; $('customer_notes').value=c.notes||''; $('customerFormTitle').textContent=tr('customerFormTitle'); $('customerSaveBtn').textContent=tr('customerEditSave'); $('cancelCustomerEditBtn').textContent=tr('customerCancelEdit'); $('cancelCustomerEditBtn').classList.remove('hidden'); handleWhatsappInput(); switchTab('customers'); window.scrollTo({top:0,behavior:'smooth'}); }
+function editAccount(id){ const a=accountById(id); $('account_id').value=a.id; $('account_label').value=a.label||''; $('account_login').value=a.login||''; $('account_password').value=a.password||''; $('account_provider').value=a.provider||''; $('account_cost').value=a.acquisition_cost||''; $('account_acquired_at').value=a.acquired_at||''; $('account_notes').value=a.notes||''; $('accountFormTitle').textContent=tr('accountFormTitle'); $('accountSaveBtn').textContent=tr('accountEditSave'); $('cancelAccountEditBtn').textContent=tr('accountCancelEdit'); $('cancelAccountEditBtn').classList.remove('hidden'); switchTab('accounts'); window.scrollTo({top:0,behavior:'smooth'}); }
+function editSale(id){ const s=state.sales.find(x=>x.id===id); if(!s) return; $('sale_id').value=s.id; $('sale_customer_id').value=s.customer_id||''; $('sale_initial_account_id').value=s.initial_account_id||''; $('sale_sold_at').value=s.sold_at||''; $('sale_warranty_days').value=s.warranty_days||30; $('sale_price').value=s.sale_price||''; refreshSaleStatusOptions(); $('sale_status').value=s.status||'active'; $('sale_notes').value=s.notes||''; $('saleFormTitle').textContent=tr('saleFormTitle'); $('saleSaveBtn').textContent=tr('saleEditSave'); $('cancelSaleEditBtn').textContent=tr('saleCancelEdit'); $('cancelSaleEditBtn').classList.remove('hidden'); switchTab('sales'); window.scrollTo({top:0,behavior:'smooth'}); }
 function editReplacement(id){ const r=state.replacements.find(x=>x.id===id); if(!r) return; $('replacement_id').value=r.id; $('replacement_sale_id').value=r.sale_id||''; $('replacement_account_id').value=r.replacement_account_id||''; $('replacement_replaced_at').value=r.replaced_at||''; $('replacement_reason').value=r.reason||''; $('replacement_notes').value=r.notes||''; $('replacementFormTitle').textContent='Editar reposição'; $('replacementSaveBtn').textContent='Salvar alterações'; $('cancelReplacementEditBtn').classList.remove('hidden'); switchTab('replacements'); window.scrollTo({top:0,behavior:'smooth'}); }
 function translateAccountStatus(status){
-  return ({ available:'Disponível', sold:'Vendida', replaced:'Reposição', blocked:'Bloqueada', in_warranty:'Em garantia' })[status] || status || '—';
+  return ({ available:tr('commonAvailable'), sold:tr('statusActive'), replaced:tr('commonReplacement'), blocked:tr('commonBlocked'), in_warranty:tr('commonWarranty') })[status] || status || '—';
 }
 async function setAccountStatus(id, status){
   const { error } = await sb.from('warranty_accounts').update({ status }).eq('id', id);
