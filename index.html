@@ -208,15 +208,15 @@
                 <div><h2 id="accountFormTitle">Nova conta</h2><p>Controle de estoque e origem das contas.</p></div>
                 <button class="btn btn-secondary hidden" id="cancelAccountEditBtn" onclick="resetAccountForm()">Cancelar edição</button>
               </div>
-              <div class="form-grid">
+              <div class="form-grid" autocomplete="off">
                 <input type="hidden" id="account_id">
-                <input id="account_label" class="field" placeholder="Nome interno da conta">
-                <input id="account_login" class="field" placeholder="Login / e-mail">
-                <input id="account_password" class="field" placeholder="Senha">
-                <input id="account_provider" class="field" placeholder="Fornecedor / origem">
+                <input id="account_label" class="field" placeholder="Nome interno da conta" autocomplete="off">
+                <input id="account_login" class="field" placeholder="Login / e-mail" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" name="account_login_unique" readonly onfocus="this.removeAttribute('readonly');">
+                <input id="account_password" class="field" placeholder="Senha" autocomplete="new-password">
+                <input id="account_provider" class="field" placeholder="Fornecedor / origem" autocomplete="off">
                 <input id="account_cost" class="field" type="number" step="0.01" placeholder="Custo (R$)">
-                <select id="account_status"><option value="available">Disponível</option><option value="sold">Vendida</option><option value="in_warranty">Em garantia</option><option value="replaced">Substituída</option><option value="blocked">Bloqueada</option></select>
                 <input id="account_acquired_at" class="field" type="date">
+                <div class="item" style="padding:12px 14px;background:rgba(73,168,255,.06);border-color:rgba(73,168,255,.14)"><div class="item-title" style="font-size:.92rem">Status inicial automático</div><div class="item-meta">Toda conta nova entra como <strong>disponível</strong>. Depois, no estoque, ele pode mudar para <strong>bloqueada</strong> ou <strong>reposição</strong>. Ao vender, o sistema marca como <strong>vendida</strong> automaticamente.</div></div>
                 <textarea id="account_notes" class="full" rows="4" placeholder="Observações"></textarea>
                 <button class="btn btn-primary full" onclick="saveAccount()" id="accountSaveBtn">Salvar conta</button>
               </div>
@@ -467,7 +467,7 @@ function renderCustomers(){
 }
 function renderAccounts(){
   const q = val('accountSearch').toLowerCase();
-  const items = state.accounts.filter(a=>`${a.label||''} ${a.login||''} ${a.provider||''}`.toLowerCase().includes(q)).map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.label || a.login || 'Conta'}</div><div class="item-meta">${a.login || 'Sem login'}<br>Fornecedor: ${a.provider || '—'}<br>Custo: ${money(a.acquisition_cost)} · adquirida em ${fmtDate(a.acquired_at)}</div></div><span class="chip ${a.status==='available'?'green':a.status==='blocked'?'red':'yellow'}">${a.status}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editAccount('${a.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-danger" onclick="deleteAccount('${a.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`).join('');
+  const items = state.accounts.filter(a=>`${a.label||''} ${a.login||''} ${a.provider||''}`.toLowerCase().includes(q)).map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.label || a.login || 'Conta'}</div><div class="item-meta">${a.login || 'Sem login'}<br>Fornecedor: ${a.provider || '—'}<br>Custo: ${money(a.acquisition_cost)} · adquirida em ${fmtDate(a.acquired_at)}</div></div><span class="chip ${a.status==='available'?'green':a.status==='blocked'?'red':'yellow'}">${translateAccountStatus(a.status)}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editAccount('${a.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','available')">Disponível</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','replaced')">Reposição</button><button class="btn btn-secondary" onclick="setAccountStatus('${a.id}','blocked')">Bloqueada</button><button class="btn btn-danger" onclick="deleteAccount('${a.id}')"><i class="fa-solid fa-trash"></i> Excluir</button></div></div>`).join('');
   $('accountsList').innerHTML = items || '<div class="empty">Nenhuma conta cadastrada.</div>';
 }
 function renderSales(){
@@ -490,7 +490,7 @@ function renderReplacements(){
 }
 function switchTab(name){ document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden')); $('tab-'+name).classList.remove('hidden'); document.querySelectorAll('.side-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab===name)); }
 function resetCustomerForm(){ $('customer_id').value=''; $('customer_name').value=''; $('customer_whatsapp').value=''; $('customer_notes').value=''; $('customerFormTitle').textContent='Novo cliente'; $('customerSaveBtn').textContent='Salvar cliente'; $('cancelCustomerEditBtn').classList.add('hidden'); resetGeoCard(); }
-function resetAccountForm(){ $('account_id').value=''; ['account_label','account_login','account_password','account_provider','account_cost','account_acquired_at','account_notes'].forEach(id=>$(id).value=''); $('account_status').value='available'; $('accountFormTitle').textContent='Nova conta'; $('accountSaveBtn').textContent='Salvar conta'; $('cancelAccountEditBtn').classList.add('hidden'); }
+function resetAccountForm(){ $('account_id').value=''; ['account_label','account_login','account_password','account_provider','account_cost','account_acquired_at','account_notes'].forEach(id=>$(id).value=''); $('accountFormTitle').textContent='Nova conta'; $('accountSaveBtn').textContent='Salvar conta'; $('cancelAccountEditBtn').classList.add('hidden'); }
 function resetSaleForm(){ $('sale_id').value=''; $('sale_customer_id').value=''; $('sale_initial_account_id').value=''; $('sale_sold_at').value=''; $('sale_warranty_days').value='30'; $('sale_price').value=''; $('sale_status').value='active'; $('sale_notes').value=''; $('saleFormTitle').textContent='Registrar venda inicial'; $('saleSaveBtn').textContent='Salvar venda'; $('cancelSaleEditBtn').classList.add('hidden'); }
 function resetReplacementForm(){ $('replacement_id').value=''; $('replacement_sale_id').value=''; $('replacement_account_id').value=''; $('replacement_replaced_at').value=''; $('replacement_reason').value=''; $('replacement_notes').value=''; $('replacementFormTitle').textContent='Registrar reposição'; $('replacementSaveBtn').textContent='Salvar reposição'; $('cancelReplacementEditBtn').classList.add('hidden'); }
 async function saveCustomer(){
@@ -504,12 +504,18 @@ async function saveCustomer(){
   resetCustomerForm(); toast(id ? 'Cliente atualizado.' : 'Cliente salvo.'); await loadAll();
 }
 async function saveAccount(){
-  const payload = { label: val('account_label'), login: val('account_login'), password: val('account_password'), provider: val('account_provider'), acquisition_cost: num('account_cost') || 0, status: val('account_status'), acquired_at: val('account_acquired_at') || null, notes: val('account_notes') };
+  const payload = { label: val('account_label'), login: val('account_login'), password: val('account_password'), provider: val('account_provider'), acquisition_cost: num('account_cost') || 0, acquired_at: val('account_acquired_at') || null, notes: val('account_notes') };
   if(!payload.login && !payload.label) return toast('Informe ao menos login ou nome interno.');
   const id=val('account_id');
+  if(id){
+    const current = accountById(id);
+    payload.status = current.status || 'available';
+  } else {
+    payload.status = 'available';
+  }
   const query = id ? sb.from('warranty_accounts').update(payload).eq('id', id) : sb.from('warranty_accounts').insert(payload);
   const { error } = await query; if(error) return fail(error);
-  resetAccountForm(); toast(id ? 'Conta atualizada.' : 'Conta salva.'); await loadAll();
+  resetAccountForm(); toast(id ? 'Conta atualizada.' : 'Conta salva como disponível.'); await loadAll();
 }
 async function saveSale(){
   const payload = { customer_id: val('sale_customer_id'), initial_account_id: val('sale_initial_account_id'), sold_at: val('sale_sold_at'), warranty_days: num('sale_warranty_days') || 30, sale_price: num('sale_price') || 0, status: val('sale_status'), notes: val('sale_notes') };
@@ -530,9 +536,18 @@ async function saveReplacement(){
   resetReplacementForm(); toast(id ? 'Reposição atualizada.' : 'Reposição registrada.'); await loadAll();
 }
 function editCustomer(id){ const c=customerById(id); $('customer_id').value=c.id; $('customer_name').value=c.name||''; $('customer_whatsapp').value=c.whatsapp||''; $('customer_notes').value=c.notes||''; $('customerFormTitle').textContent='Editar cliente'; $('customerSaveBtn').textContent='Salvar alterações'; $('cancelCustomerEditBtn').classList.remove('hidden'); handleWhatsappInput(); switchTab('customers'); window.scrollTo({top:0,behavior:'smooth'}); }
-function editAccount(id){ const a=accountById(id); $('account_id').value=a.id; $('account_label').value=a.label||''; $('account_login').value=a.login||''; $('account_password').value=a.password||''; $('account_provider').value=a.provider||''; $('account_cost').value=a.acquisition_cost||''; $('account_status').value=a.status||'available'; $('account_acquired_at').value=a.acquired_at||''; $('account_notes').value=a.notes||''; $('accountFormTitle').textContent='Editar conta'; $('accountSaveBtn').textContent='Salvar alterações'; $('cancelAccountEditBtn').classList.remove('hidden'); switchTab('accounts'); window.scrollTo({top:0,behavior:'smooth'}); }
+function editAccount(id){ const a=accountById(id); $('account_id').value=a.id; $('account_label').value=a.label||''; $('account_login').value=a.login||''; $('account_password').value=a.password||''; $('account_provider').value=a.provider||''; $('account_cost').value=a.acquisition_cost||''; $('account_acquired_at').value=a.acquired_at||''; $('account_notes').value=a.notes||''; $('accountFormTitle').textContent='Editar conta'; $('accountSaveBtn').textContent='Salvar alterações'; $('cancelAccountEditBtn').classList.remove('hidden'); switchTab('accounts'); window.scrollTo({top:0,behavior:'smooth'}); }
 function editSale(id){ const s=state.sales.find(x=>x.id===id); if(!s) return; $('sale_id').value=s.id; $('sale_customer_id').value=s.customer_id||''; $('sale_initial_account_id').value=s.initial_account_id||''; $('sale_sold_at').value=s.sold_at||''; $('sale_warranty_days').value=s.warranty_days||30; $('sale_price').value=s.sale_price||''; $('sale_status').value=s.status||'active'; $('sale_notes').value=s.notes||''; $('saleFormTitle').textContent='Editar venda'; $('saleSaveBtn').textContent='Salvar alterações'; $('cancelSaleEditBtn').classList.remove('hidden'); switchTab('sales'); window.scrollTo({top:0,behavior:'smooth'}); }
 function editReplacement(id){ const r=state.replacements.find(x=>x.id===id); if(!r) return; $('replacement_id').value=r.id; $('replacement_sale_id').value=r.sale_id||''; $('replacement_account_id').value=r.replacement_account_id||''; $('replacement_replaced_at').value=r.replaced_at||''; $('replacement_reason').value=r.reason||''; $('replacement_notes').value=r.notes||''; $('replacementFormTitle').textContent='Editar reposição'; $('replacementSaveBtn').textContent='Salvar alterações'; $('cancelReplacementEditBtn').classList.remove('hidden'); switchTab('replacements'); window.scrollTo({top:0,behavior:'smooth'}); }
+function translateAccountStatus(status){
+  return ({ available:'Disponível', sold:'Vendida', replaced:'Reposição', blocked:'Bloqueada', in_warranty:'Em garantia' })[status] || status || '—';
+}
+async function setAccountStatus(id, status){
+  const { error } = await sb.from('warranty_accounts').update({ status }).eq('id', id);
+  if(error) return fail(error);
+  toast(`Conta marcada como ${translateAccountStatus(status)}.`);
+  await loadAll();
+}
 async function deleteCustomer(id){ if(!confirm('Excluir este cliente?')) return; const { error } = await sb.from('warranty_customers').delete().eq('id', id); if(error) return fail(error); resetCustomerForm(); toast('Cliente excluído.'); await loadAll(); }
 async function deleteAccount(id){ if(!confirm('Excluir esta conta?')) return; const { error } = await sb.from('warranty_accounts').delete().eq('id', id); if(error) return fail(error); resetAccountForm(); toast('Conta excluída.'); await loadAll(); }
 async function deleteSale(id){ if(!confirm('Excluir esta venda?')) return; const { error } = await sb.from('warranty_sales').delete().eq('id', id); if(error) return fail(error); resetSaleForm(); toast('Venda excluída.'); await loadAll(); }
