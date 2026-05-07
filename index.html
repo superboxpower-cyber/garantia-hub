@@ -127,13 +127,14 @@
       <div class="brand">
         <img src="https://i.postimg.cc/jjDs2bPw/Digita-LStore.png" alt="Logo">
         <div>
-          <div class="eyebrow">Painel operacional</div>
-          <h1 class="title">Central de Garantias</h1>
+          <div class="eyebrow" id="loginEyebrow">آپریشنل پینل</div>
+          <h1 class="title" id="loginTitle">سینٹرل آف وارنٹیز</h1>
+          <div class="small" id="loginSubtitle" style="margin-top:8px;color:var(--muted)">وارنٹی، اکاؤنٹس اور فروخت کا کنٹرول</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:18px">
-        <input id="pinInput" class="field" type="password" placeholder="PIN de acesso">
-        <button class="btn btn-primary" onclick="unlockApp()">Entrar</button>
+        <input id="pinInput" class="field" type="password" inputmode="numeric" placeholder="رسائی PIN" onkeydown="if(event.key==='Enter') unlockApp()">
+        <button class="btn btn-primary" id="loginBtn" onclick="unlockApp()">داخل ہوں</button>
       </div>
     </div>
   </div>
@@ -315,9 +316,12 @@ const SUPABASE_URL = 'https://epwmoicgvuprzkcpxjoy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues';
 const APP_PIN = '5425';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{persistSession:false,autoRefreshToken:false} });
-const state = { customers: [], accounts: [], sales: [], replacements: [], supportsCustomerGeo: false, language: localStorage.getItem('garantia_hub_lang') || 'pt-BR' };
+const savedLang = localStorage.getItem('garantia_hub_lang');
+const savedLangManual = localStorage.getItem('garantia_hub_lang_manual') === '1';
+const state = { customers: [], accounts: [], sales: [], replacements: [], supportsCustomerGeo: false, language: savedLangManual && savedLang ? savedLang : 'ur-PK' };
 const I18N = {
   'pt-BR': {
+    loginEyebrow:'Painel operacional', loginTitle:'Central de Garantias', loginSubtitle:'Controle de garantias, contas e vendas', loginPinPlaceholder:'PIN de acesso', loginBtn:'Entrar', loginInvalid:'PIN inválido.',
     sidebarEyebrow:'Painel operacional', sidebarTitle:'Garantias', navDashboard:'Dashboard', navCustomers:'Clientes', navAccounts:'Contas', navSales:'Vendas',
     sidebarNote:'A garantia sempre segue a <strong>compra original</strong>. Reposição não reinicia prazo.', topbarEyebrow:'Central operacional', topbarTitle:'Central de Garantias',
     refreshBtn:'<i class="fa-solid fa-rotate-right"></i> Atualizar', logoutBtn:'<i class="fa-solid fa-right-from-bracket"></i> Sair',
@@ -338,9 +342,11 @@ const I18N = {
     emptySearch:'Busque por cliente, WhatsApp ou qualquer conta para enxergar a compra original, o prazo da garantia e todas as reposições ligadas.', emptyNoResult:'Nenhum resultado encontrado para essa busca.',
     resultContact:'Contato', resultCountryFallback:'País não identificado', resultOriginal:'Conta original', resultWarrantyDays:'dias de garantia', resultRemaining:'Faltam {days} dias', resultExpired:'Venceu há {days} dias', resultReplacements:'Reposições desta compra', resultNoReplacements:'Nenhuma reposição nessa compra.', resultMatchedReplacement:'Busca bateu numa reposição entregue em {date} · vence em {end}',
     commonNoData:'Sem dados', commonNoWhatsapp:'Sem WhatsApp', commonNoLogin:'Sem login', commonProvider:'Fornecedor', commonCost:'Custo', commonAcquired:'adquirida em', commonEdit:'Editar', commonDelete:'Excluir', commonAvailable:'Disponível', commonReplacement:'Reposição', commonBlocked:'Bloqueada', commonCustomer:'Cliente', commonPurchase:'Compra', commonWarranty:'Garantia', commonPrice:'Preço', commonCurrentAccount:'Conta atual', commonInitialAccount:'Conta inicial', commonReason:'Motivo', commonOriginalWarrantyUntil:'Garantia original até', commonRemainShort:'restam {days}d', commonExpiredShort:'vencida', commonNoCustomers:'Nenhum cliente cadastrado.', commonNoAccounts:'Nenhuma conta cadastrada.', commonNoSales:'Nenhuma venda registrada.', commonNoRows:'Sem vendas ainda.',
-    optionSelectCustomer:'Selecione o cliente', optionSelectAccount:'Selecione a conta', optionSelectSale:'Selecione a venda', statusActive:'Ativa', statusExpired:'Expirada', statusCancelled:'Cancelada', badgeNoDate:'Sem data', badgeExpired:'Vencida há {days}d', badgeSoon:'Vence em {days}d', badgeActive:'Ativa · {days}d'
+    optionSelectCustomer:'Selecione o cliente', optionSelectAccount:'Selecione a conta', optionSelectSale:'Selecione a venda', statusActive:'Ativa', statusExpired:'Expirada', statusCancelled:'Cancelada', badgeNoDate:'Sem data', badgeExpired:'Vencida há {days}d', badgeSoon:'Vence em {days}d', badgeActive:'Ativa · {days}d',
+    tableReplacement:'Reposições', deliveredOn:'Entregue', customerCountryFallback:'País não identificado'
   },
   'ur-PK': {
+    loginEyebrow:'آپریشنل پینل', loginTitle:'سینٹرل آف وارنٹیز', loginSubtitle:'وارنٹی، اکاؤنٹس اور فروخت کا مکمل کنٹرول', loginPinPlaceholder:'رسائی PIN', loginBtn:'داخل ہوں', loginInvalid:'غلط PIN۔',
     sidebarEyebrow:'آپریشنل پینل', sidebarTitle:'وارنٹیز', navDashboard:'ڈیش بورڈ', navCustomers:'گاہک', navAccounts:'اکاؤنٹس', navSales:'فروخت',
     sidebarNote:'وارنٹی ہمیشہ <strong>اصل خریداری</strong> کے ساتھ جڑی رہتی ہے۔ متبادل سے مدت دوبارہ شروع نہیں ہوتی۔', topbarEyebrow:'آپریشنل مرکز', topbarTitle:'سینٹرل آف وارنٹیز',
     refreshBtn:'<i class="fa-solid fa-rotate-right"></i> تازہ کریں', logoutBtn:'<i class="fa-solid fa-right-from-bracket"></i> باہر نکلیں',
@@ -361,7 +367,8 @@ const I18N = {
     emptySearch:'گاہک، واٹس ایپ یا کوئی بھی اکاؤنٹ تلاش کریں تاکہ اصل خریداری، وارنٹی کی مدت اور جڑی ہوئی تمام تبدیلیاں دیکھی جا سکیں۔', emptyNoResult:'اس تلاش کے لیے کوئی نتیجہ نہیں ملا۔',
     resultContact:'رابطہ', resultCountryFallback:'ملک شناخت نہیں ہوا', resultOriginal:'اصل اکاؤنٹ', resultWarrantyDays:'دن کی وارنٹی', resultRemaining:'{days} دن باقی ہیں', resultExpired:'{days} دن پہلے ختم ہوئی', resultReplacements:'اس خریداری کے متبادل', resultNoReplacements:'اس خریداری میں کوئی متبادل نہیں۔', resultMatchedReplacement:'تلاش ایک متبادل سے ملی جو {date} کو دیا گیا تھا · اختتام {end}',
     commonNoData:'کوئی ڈیٹا نہیں', commonNoWhatsapp:'واٹس ایپ نہیں', commonNoLogin:'لاگ اِن نہیں', commonProvider:'فراہم کنندہ', commonCost:'لاگت', commonAcquired:'حاصل کی گئی', commonEdit:'ترمیم', commonDelete:'حذف', commonAvailable:'دستیاب', commonReplacement:'متبادل', commonBlocked:'بلاک', commonCustomer:'گاہک', commonPurchase:'خریداری', commonWarranty:'وارنٹی', commonPrice:'قیمت', commonCurrentAccount:'موجودہ اکاؤنٹ', commonInitialAccount:'اصل اکاؤنٹ', commonReason:'وجہ', commonOriginalWarrantyUntil:'اصل وارنٹی ختم ہونے کی تاریخ', commonRemainShort:'{days}دن باقی', commonExpiredShort:'ختم شدہ', commonNoCustomers:'کوئی گاہک درج نہیں۔', commonNoAccounts:'کوئی اکاؤنٹ درج نہیں۔', commonNoSales:'کوئی فروخت درج نہیں۔', commonNoRows:'ابھی کوئی فروخت نہیں۔',
-    optionSelectCustomer:'گاہک منتخب کریں', optionSelectAccount:'اکاؤنٹ منتخب کریں', optionSelectSale:'فروخت منتخب کریں', statusActive:'فعال', statusExpired:'ختم شدہ', statusCancelled:'منسوخ', badgeNoDate:'تاریخ نہیں', badgeExpired:'{days}دن پہلے ختم', badgeSoon:'{days}دن میں ختم', badgeActive:'فعال · {days}دن'
+    optionSelectCustomer:'گاہک منتخب کریں', optionSelectAccount:'اکاؤنٹ منتخب کریں', optionSelectSale:'فروخت منتخب کریں', statusActive:'فعال', statusExpired:'ختم شدہ', statusCancelled:'منسوخ', badgeNoDate:'تاریخ نہیں', badgeExpired:'{days}دن پہلے ختم', badgeSoon:'{days}دن میں ختم', badgeActive:'فعال · {days}دن',
+    tableReplacement:'متبادل', deliveredOn:'فراہم کی گئی', customerCountryFallback:'ملک شناخت نہیں ہوا'
   }
 };
 
@@ -370,9 +377,12 @@ function toast(msg){ const el=$('toast'); el.textContent=msg; el.style.display='
 function tr(key, vars={}){ const t = I18N[state.language] || I18N['pt-BR']; let s = t[key] || I18N['pt-BR'][key] || key; Object.entries(vars).forEach(([k,v]) => { s = s.replaceAll(`{${k}}`, v); }); return s; }
 function applyLanguage(){
   const t = I18N[state.language] || I18N['pt-BR'];
-  const textIds = ['sidebarEyebrow','sidebarTitle','navDashboard','navCustomers','navAccounts','navSales','topbarEyebrow','topbarTitle','dashSearchTitle','dashSearchSubtitle','alertsTitle','alertsSubtitle','summaryTitle','summarySubtitle','activeWarrantyTitle','activeWarrantySubtitle'];
+  document.title = t.loginTitle || 'Central de Garantias';
+  const textIds = ['loginEyebrow','loginTitle','loginSubtitle','sidebarEyebrow','sidebarTitle','navDashboard','navCustomers','navAccounts','navSales','topbarEyebrow','topbarTitle','dashSearchTitle','dashSearchSubtitle','alertsTitle','alertsSubtitle','summaryTitle','summarySubtitle','activeWarrantyTitle','activeWarrantySubtitle'];
   textIds.forEach(id => { const el = $(id); if(el && t[id]) el.textContent = t[id]; });
   if($('sidebarNote')) $('sidebarNote').innerHTML = t.sidebarNote;
+  if($('pinInput')) $('pinInput').placeholder = t.loginPinPlaceholder;
+  if($('loginBtn')) $('loginBtn').textContent = t.loginBtn;
   if($('refreshBtn')) $('refreshBtn').innerHTML = t.refreshBtn;
   if($('logoutBtn')) $('logoutBtn').innerHTML = t.logoutBtn;
   if($('clearSearchBtn')) $('clearSearchBtn').innerHTML = t.clearSearchBtn;
@@ -416,13 +426,18 @@ function applyLanguage(){
   document.querySelectorAll('[data-i18n-sale-list-subtitle]').forEach(el=>el.textContent=t.saleListSubtitle);
   document.documentElement.lang = state.language === 'ur-PK' ? 'ur' : 'pt-BR';
   document.body.dir = state.language === 'ur-PK' ? 'rtl' : 'ltr';
-  if($('languageSelect')) $('languageSelect').value = state.language;
+  if($('languageSelect')) {
+    $('languageSelect').value = state.language;
+    const opts = $('languageSelect').options;
+    if(opts[0]) opts[0].text = 'Português (Brasil)';
+    if(opts[1]) opts[1].text = 'اردو (پاکستان)';
+  }
   refreshSaleStatusOptions();
   renderKpis(); renderDashboard(); renderManagerSummary(); renderDashboardSearch(); renderCustomers(); renderAccounts(); renderSales();
 }
-function setLanguage(lang){ state.language = lang; localStorage.setItem('garantia_hub_lang', lang); applyLanguage(); }
-function money(v){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
-function fmtDate(v){ if(!v) return '—'; const d=new Date(v+'T12:00:00'); return d.toLocaleDateString('pt-BR'); }
+function setLanguage(lang){ state.language = lang; localStorage.setItem('garantia_hub_lang', lang); localStorage.setItem('garantia_hub_lang_manual', '1'); applyLanguage(); }
+function money(v){ return new Intl.NumberFormat(state.language === 'ur-PK' ? 'ur-PK' : 'pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
+function fmtDate(v){ if(!v) return '—'; const d=new Date(v+'T12:00:00'); return d.toLocaleDateString(state.language === 'ur-PK' ? 'ur-PK' : 'pt-BR'); }
 function addDays(dateStr, days){ const d=new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+Number(days||0)); return d; }
 function isoDate(d){ return d.toISOString().slice(0,10); }
 function guaranteeEnd(sale){ return sale?.sold_at ? isoDate(addDays(sale.sold_at, Number(sale.warranty_days||0))) : null; }
@@ -474,7 +489,7 @@ function detectCountryMeta(raw){
   const [dialCode,countryCode,countryName,language] = found;
   return { dialCode,countryCode,countryName,language,flag:flagFromCountryCode(countryCode) };
 }
-function resetGeoCard(){ $('customerGeoCard').style.display='none'; $('customerGeoFlag').textContent='🌍'; $('customerGeoTitle').textContent='País não identificado'; $('customerGeoSubtitle').textContent='Preencha o WhatsApp com código do país.'; }
+function resetGeoCard(){ $('customerGeoCard').style.display='none'; $('customerGeoFlag').textContent='🌍'; $('customerGeoTitle').textContent=tr('customerGeoUnknown'); $('customerGeoSubtitle').textContent=tr('customerGeoHint'); }
 function handleWhatsappInput(){
   const input=$('customer_whatsapp');
   const digitsBefore=normalizeWhatsapp(input.value);
@@ -569,12 +584,12 @@ function renderDashboardSearch(){
       return hay.includes(q.toLowerCase());
     });
     const replacementNote = matchedReplacement ? `<div class="chip yellow" style="margin-bottom:10px">${tr('resultMatchedReplacement',{date:fmtDate(matchedReplacement.replaced_at), end:fmtDate(end)})}</div>` : '';
-    const repsHtml = reps.length ? reps.map(r=>{ const a=accountById(r.replacement_account_id); return `<div class="item" style="padding:12px;margin-top:10px"><div class="item-title" style="font-size:.95rem">${a.login || a.label || 'Conta de reposição'}</div><div class="item-meta">${state.language==='ur-PK' ? 'فراہم کی گئی' : 'Entregue'} ${fmtDate(r.replaced_at)}${r.reason ? ` · ${r.reason}` : ''}</div></div>`; }).join('') : `<div class="empty" style="margin-top:10px">${tr('resultNoReplacements')}</div>`;
+    const repsHtml = reps.length ? reps.map(r=>{ const a=accountById(r.replacement_account_id); return `<div class="item" style="padding:12px;margin-top:10px"><div class="item-title" style="font-size:.95rem">${a.login || a.label || tr('tableReplacement')}</div><div class="item-meta">${tr('deliveredOn')} ${fmtDate(r.replaced_at)}${r.reason ? ` · ${r.reason}` : ''}</div></div>`; }).join('') : `<div class="empty" style="margin-top:10px">${tr('resultNoReplacements')}</div>`;
     return `<div class="item" style="padding:18px 18px 16px">
       ${replacementNote}
       <div class="item-head">
         <div>
-          <div class="item-title" style="font-size:1.05rem">${c.name || 'Cliente'} - ${tr('resultContact')} ${c.whatsapp || 'sem número'} - ${flag} ${c.country_name || tr('resultCountryFallback')}</div>
+          <div class="item-title" style="font-size:1.05rem">${c.name || tr('commonCustomer')} - ${tr('resultContact')} ${c.whatsapp || tr('commonNoWhatsapp')} - ${flag} ${c.country_name || tr('resultCountryFallback')}</div>
           <div class="item-meta" style="margin-top:8px">
             <strong>${initial.login || initial.label || tr('resultOriginal')}</strong> - ${s.warranty_days} ${tr('resultWarrantyDays')} - ${fmtDate(s.sold_at)} a ${fmtDate(end)} - ${d < 0 ? tr('resultExpired',{days:Math.abs(d)}) : tr('resultRemaining',{days:d})}
           </div>
@@ -605,12 +620,13 @@ function renderSalesTable(){
     const c=customerById(s.customer_id), acc=accountById(currentAccountForSale(s)), end=guaranteeEnd(s), d=daysLeft(end), reps=replacementsBySale(s.id).length;
     return `<tr><td><strong>${c.name || '—'}</strong><div class="small" style="color:var(--muted)">${c.whatsapp || tr('commonNoWhatsapp')}</div></td><td>${acc.label || acc.login || '—'}</td><td>${fmtDate(s.sold_at)}</td><td>${fmtDate(end)}</td><td>${badgeByDays(d)}</td><td>${reps}</td></tr>`;
   }).join('');
-  $('salesTableWrap').innerHTML = `<table><thead><tr><th>${tr('commonCustomer')}</th><th>${tr('commonCurrentAccount')}</th><th>${tr('commonPurchase')}</th><th>${tr('commonOriginalWarrantyUntil')}</th><th>${tr('statusActive')}</th><th>${tr('commonReplacement')}</th></tr></thead><tbody>${rows || `<tr><td colspan="6"><div class="empty">${tr('commonNoRows')}</div></td></tr>`}</tbody></table>`;
+  $('salesTableWrap').innerHTML = `<table><thead><tr><th>${tr('tableReplacement')}</th><th>${tr('statusActive')}</th><th>${tr('commonOriginalWarrantyUntil')}</th><th>${tr('commonPurchase')}</th><th>${tr('commonCurrentAccount')}</th><th>${tr('commonCustomer')}</th></tr></thead><tbody>${rows || `<tr><td colspan="6"><div class="empty">${tr('commonNoRows')}</div></td></tr>`}</tbody></table>`;
+  if(state.language !== 'ur-PK') $('salesTableWrap').innerHTML = `<table><thead><tr><th>${tr('commonCustomer')}</th><th>${tr('commonCurrentAccount')}</th><th>${tr('commonPurchase')}</th><th>${tr('commonOriginalWarrantyUntil')}</th><th>${tr('statusActive')}</th><th>${tr('tableReplacement')}</th></tr></thead><tbody>${rows || `<tr><td colspan="6"><div class="empty">${tr('commonNoRows')}</div></td></tr>`}</tbody></table>`;
 }
 function renderCustomers(){
   const q = val('customerSearch').toLowerCase();
   const items = state.customers.filter(c=>`${c.name} ${c.whatsapp||''} ${c.country_name||''} ${c.language||''}`.toLowerCase().includes(q)).map(c=>{
-    const flag = resolveFlag(c), geo = c.country_name ? `${flag} ${c.country_name}${c.language ? ' · ' + c.language : ''}` : 'País não identificado';
+    const flag = resolveFlag(c), geo = c.country_name ? `${flag} ${c.country_name}${c.language ? ' · ' + c.language : ''}` : tr('customerCountryFallback');
     return `<div class="item"><div class="item-head"><div><div class="item-title">${c.name}</div><div class="item-meta">${c.whatsapp || tr('commonNoWhatsapp')}<br>${geo}${c.notes ? `<br>${c.notes}` : ''}</div></div><span class="chip blue">${tr('commonCustomer')}</span></div><div class="item-actions"><button class="btn btn-secondary" onclick="editCustomer('${c.id}')"><i class="fa-solid fa-pen"></i> ${tr('commonEdit')}</button><button class="btn btn-danger" onclick="deleteCustomer('${c.id}')"><i class="fa-solid fa-trash"></i> ${tr('commonDelete')}</button></div></div>`;
   }).join('');
   $('customersList').innerHTML = items || `<div class="empty">${tr('commonNoCustomers')}</div>`;
@@ -715,7 +731,7 @@ async function deleteCustomer(id){ if(!confirm('Excluir este cliente?')) return;
 async function deleteAccount(id){ if(!confirm('Excluir esta conta?')) return; const { error } = await sb.from('warranty_accounts').delete().eq('id', id); if(error) return fail(error); resetAccountForm(); toast('Conta excluída.'); await loadAll(); }
 async function deleteSale(id){ if(!confirm('Excluir esta venda?')) return; const { error } = await sb.from('warranty_sales').delete().eq('id', id); if(error) return fail(error); resetSaleForm(); toast('Venda excluída.'); await loadAll(); }
 async function deleteReplacement(id){ if(!confirm('Excluir esta reposição?')) return; const { error } = await sb.from('warranty_replacements').delete().eq('id', id); if(error) return fail(error); resetReplacementForm(); toast('Reposição excluída.'); await loadAll(); }
-function unlockApp(){ if($('pinInput').value !== APP_PIN) return toast('PIN inválido.'); localStorage.setItem('warranty_hub_ok','1'); $('loginView').classList.add('hidden'); $('appView').classList.remove('hidden'); loadAll(); }
+function unlockApp(){ if(val('pinInput') !== APP_PIN) return toast(tr('loginInvalid')); localStorage.setItem('warranty_hub_ok','1'); $('loginView').classList.add('hidden'); $('appView').classList.remove('hidden'); loadAll(); }
 function logout(){ localStorage.removeItem('warranty_hub_ok'); location.reload(); }
 applyLanguage();
 if(localStorage.getItem('warranty_hub_ok')==='1'){ $('loginView').classList.add('hidden'); $('appView').classList.remove('hidden'); loadAll(); }
