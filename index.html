@@ -25,6 +25,10 @@
     .main{grid-template-columns:1.3fr .9fr}.panel{padding:18px}.panel h2{margin:0 0 12px;font-size:1.05rem}
     .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{background:#0f1730;color:var(--muted);border:1px solid var(--line);padding:10px 14px;border-radius:999px;cursor:pointer}.tab.active{background:var(--accent);color:#08101d;border-color:transparent;font-weight:700}
     .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select,.toolbar textarea,.toolbar button,.form input,.form select,.form textarea{width:100%;background:#0c1430;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:inherit}
+    .geo-inline{display:none;align-items:center;gap:12px;padding:10px 12px;margin-top:-2px;margin-bottom:2px;border-radius:14px;background:linear-gradient(180deg,rgba(57,160,255,.08),rgba(57,160,255,.03));border:1px solid rgba(57,160,255,.20)}
+    .geo-flag{font-size:1.55rem;line-height:1}
+    .geo-inline strong{display:block;font-size:.96rem}
+    .geo-inline span{display:block;font-size:.82rem;color:var(--muted)}
     button{cursor:pointer}.btn{background:var(--accent);color:#08101d;font-weight:800;border:none}.btn.secondary{background:#162242;color:var(--text);border:1px solid var(--line)}.btn.good{background:var(--good);color:#062918}
     .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form .full{grid-column:1/-1}.hidden{display:none!important}
     table{width:100%;border-collapse:collapse;font-size:.93rem} th,td{padding:12px 10px;border-bottom:1px solid rgba(159,176,214,.12);text-align:left;vertical-align:top} th{color:#c9d5f6;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
@@ -103,12 +107,13 @@
           <div class="form">
             <input id="customer_name" placeholder="Nome do cliente" />
             <input id="customer_whatsapp" placeholder="WhatsApp" oninput="handleWhatsappInput()" />
-            <div class="full" id="customerGeoCard" style="display:none; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#0b1730;">
-              <div class="small muted">País detectado pelo WhatsApp</div>
-              <div id="customerGeoText" style="margin-top:6px; font-weight:700; color:var(--text)">—</div>
+            <div class="full geo-inline" id="customerGeoCard">
+              <div class="geo-flag" id="customerGeoFlag">🌍</div>
+              <div>
+                <strong id="customerGeoTitle">País não identificado</strong>
+                <span id="customerGeoSubtitle">Preencha o WhatsApp com código do país.</span>
+              </div>
             </div>
-            <input id="customer_country" placeholder="País" readonly />
-            <input id="customer_language" placeholder="Idioma" readonly />
             <textarea id="customer_notes" class="full" rows="4" placeholder="Observações"></textarea>
             <button class="btn full" onclick="saveCustomer()">Salvar cliente</button>
           </div>
@@ -306,8 +311,8 @@ async function saveCustomer(){
   }
   if(!payload.name) return toast('Informe o nome do cliente.');
   const { error } = await sb.from('warranty_customers').insert(payload); if(error) return fail(error);
-  clear(['customer_name','customer_whatsapp','customer_country','customer_language','customer_notes']);
-  document.getElementById('customerGeoCard').style.display='none';
+  clear(['customer_name','customer_whatsapp','customer_notes']);
+  resetGeoCard();
   toast(state.supportsCustomerGeo ? 'Cliente salvo.' : 'Cliente salvo. Se quiser gravar país/idioma no banco, aplique o SQL complementar.');
   await loadAll();
 }
@@ -379,21 +384,32 @@ function detectCountryMeta(raw){
   const [dialCode, countryCode, countryName, language] = found;
   return { dialCode, countryCode, countryName, language, flag: flagFromCountryCode(countryCode) };
 }
+function resetGeoCard(){
+  const card = document.getElementById('customerGeoCard');
+  const flag = document.getElementById('customerGeoFlag');
+  const title = document.getElementById('customerGeoTitle');
+  const subtitle = document.getElementById('customerGeoSubtitle');
+  card.style.display = 'none';
+  flag.textContent = '🌍';
+  title.textContent = 'País não identificado';
+  subtitle.textContent = 'Preencha o WhatsApp com código do país.';
+}
 function handleWhatsappInput(){
   const input = document.getElementById('customer_whatsapp');
   const digitsBefore = normalizeWhatsapp(input.value);
   input.value = formatWhatsappInput(input.value);
   const geo = detectCountryMeta(digitsBefore);
-  document.getElementById('customer_country').value = geo.countryName ? `${geo.flag} ${geo.countryName}` : '';
-  document.getElementById('customer_language').value = geo.language || '';
   const card = document.getElementById('customerGeoCard');
-  const txt = document.getElementById('customerGeoText');
+  const flag = document.getElementById('customerGeoFlag');
+  const title = document.getElementById('customerGeoTitle');
+  const subtitle = document.getElementById('customerGeoSubtitle');
   if(geo.countryName){
-    txt.textContent = `${geo.flag} ${geo.countryName} · ${geo.language}`;
-    card.style.display = 'block';
+    flag.textContent = geo.flag || '🌍';
+    title.textContent = geo.countryName;
+    subtitle.textContent = geo.language || 'Idioma não identificado';
+    card.style.display = 'flex';
   } else {
-    txt.textContent = '—';
-    card.style.display = 'none';
+    resetGeoCard();
   }
 }
 function switchTab(name){ document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===name)); document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden')); document.getElementById('tab-'+name).classList.remove('hidden'); }
