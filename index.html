@@ -109,7 +109,6 @@
           <button class="side-btn" data-tab="customers" onclick="switchTab('customers')"><i class="fa-solid fa-users"></i><span>Clientes</span></button>
           <button class="side-btn" data-tab="accounts" onclick="switchTab('accounts')"><i class="fa-solid fa-key"></i><span>Contas</span></button>
           <button class="side-btn" data-tab="sales" onclick="switchTab('sales')"><i class="fa-solid fa-cart-shopping"></i><span>Vendas</span></button>
-          <button class="side-btn" data-tab="replacements" onclick="switchTab('replacements')"><i class="fa-solid fa-rotate"></i><span>Reposições</span></button>
         </div>
         <div class="sidebar-note small">
           A garantia sempre segue a <strong>compra original</strong>. Reposição não reinicia prazo.
@@ -257,29 +256,6 @@
           </div>
         </section>
 
-        <section id="tab-replacements" class="tab-body hidden">
-          <div class="grid-2">
-            <div class="glass panel">
-              <div class="section-title">
-                <div><h2 id="replacementFormTitle">Registrar reposição</h2><p>A troca fica vinculada à venda original.</p></div>
-                <button class="btn btn-secondary hidden" id="cancelReplacementEditBtn" onclick="resetReplacementForm()">Cancelar edição</button>
-              </div>
-              <div class="form-grid">
-                <input type="hidden" id="replacement_id">
-                <select id="replacement_sale_id"></select>
-                <select id="replacement_account_id"></select>
-                <input id="replacement_replaced_at" class="field" type="date">
-                <input id="replacement_reason" class="field" placeholder="Motivo da reposição">
-                <textarea id="replacement_notes" class="full" rows="4" placeholder="Observações"></textarea>
-                <button class="btn btn-primary full" onclick="saveReplacement()" id="replacementSaveBtn">Salvar reposição</button>
-              </div>
-            </div>
-            <div class="glass panel">
-              <div class="section-title"><div><h2>Histórico de reposições</h2><p>Editar motivo, data ou conta substituta.</p></div></div>
-              <div id="replacementsList" class="list"></div>
-            </div>
-          </div>
-        </section>
       </main>
     </div>
   </div>
