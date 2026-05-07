@@ -103,15 +103,19 @@
           <h2>Novo cliente</h2>
           <div class="form">
             <input id="customer_name" placeholder="Nome do cliente" />
-            <input id="customer_whatsapp" placeholder="WhatsApp" />
-            <input id="customer_email" placeholder="E-mail" />
-            <input id="customer_document" placeholder="Documento / referência" />
+            <input id="customer_whatsapp" placeholder="WhatsApp" oninput="handleWhatsappInput()" />
+            <div class="full" id="customerGeoCard" style="display:none; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#0b1730;">
+              <div class="small muted">País detectado pelo WhatsApp</div>
+              <div id="customerGeoText" style="margin-top:6px; font-weight:700; color:var(--text)">—</div>
+            </div>
+            <input id="customer_country" placeholder="País" readonly />
+            <input id="customer_language" placeholder="Idioma" readonly />
             <textarea id="customer_notes" class="full" rows="4" placeholder="Observações"></textarea>
             <button class="btn full" onclick="saveCustomer()">Salvar cliente</button>
           </div>
         </div>
         <div class="panel">
-          <div class="toolbar"><input id="customerSearch" placeholder="Buscar por nome, WhatsApp ou e-mail" oninput="renderCustomers()" /></div>
+          <div class="toolbar"><input id="customerSearch" placeholder="Buscar por nome, WhatsApp, país ou idioma" oninput="renderCustomers()" /></div>
           <div id="customersList"></div>
         </div>
       </div>
@@ -199,7 +203,7 @@ const SUPABASE_URL = 'https://epwmoicgvuprzkcpxjoy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues';
 const APP_PIN = '5425';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
-const state = { customers: [], accounts: [], sales: [], replacements: [] };
+const state = { customers: [], accounts: [], sales: [], replacements: [], supportsCustomerGeo: false };
 
 function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',3200); }
 function money(v){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
@@ -217,6 +221,10 @@ function currentAccountForSale(sale){ const reps = replacementsBySale(sale.id); 
 async function fetchTable(table, order='created_at'){ const { data, error } = await sb.from(table).select('*').order(order,{ascending:false}); if(error) throw error; return data || []; }
 async function loadAll(){
   try{
+    try {
+      const probe = await sb.from('warranty_customers').select('id,country_name,language').limit(1);
+      state.supportsCustomerGeo = !probe.error;
+    } catch { state.supportsCustomerGeo = false; }
     state.customers = await fetchTable('warranty_customers');
     state.accounts = await fetchTable('warranty_accounts');
     state.sales = await fetchTable('warranty_sales','sold_at');
@@ -267,7 +275,10 @@ function renderSalesTable(){
 }
 function renderCustomers(){
   const q = document.getElementById('customerSearch')?.value?.toLowerCase() || '';
-  const items = state.customers.filter(c=>`${c.name} ${c.whatsapp||''} ${c.email||''}`.toLowerCase().includes(q)).map(c=>`<div class="item"><strong>${c.name}</strong><div class="small muted">${c.whatsapp||'Sem WhatsApp'} · ${c.email||'Sem e-mail'}</div><div class="small muted" style="margin-top:6px">${c.notes||''}</div></div>`).join('');
+  const items = state.customers.filter(c=>`${c.name} ${c.whatsapp||''} ${c.country_name||''} ${c.language||''}`.toLowerCase().includes(q)).map(c=>{
+    const geo = c.country_name ? `${c.country_flag || '🌍'} ${c.country_name}${c.language ? ' · '+c.language : ''}` : 'País não identificado';
+    return `<div class="item"><strong>${c.name}</strong><div class="small muted">${c.whatsapp||'Sem WhatsApp'}</div><div class="small muted" style="margin-top:6px">${geo}</div><div class="small muted" style="margin-top:6px">${c.notes||''}</div></div>`;
+  }).join('');
   document.getElementById('customersList').innerHTML = items || '<div class="muted">Nenhum cliente cadastrado.</div>';
 }
 function renderAccounts(){
@@ -294,10 +305,20 @@ function renderReplacements(){
   document.getElementById('replacementsList').innerHTML = items || '<div class="muted">Nenhuma reposição registrada.</div>';
 }
 async function saveCustomer(){
-  const payload = { name: val('customer_name'), whatsapp: val('customer_whatsapp'), email: val('customer_email'), document_ref: val('customer_document'), notes: val('customer_notes') };
+  const geo = detectCountryMeta(val('customer_whatsapp'));
+  const payload = { name: val('customer_name'), whatsapp: val('customer_whatsapp'), notes: val('customer_notes') };
+  if(state.supportsCustomerGeo){
+    payload.country_code = geo.countryCode || null;
+    payload.country_name = geo.countryName || null;
+    payload.country_flag = geo.flag || null;
+    payload.language = geo.language || null;
+  }
   if(!payload.name) return toast('Informe o nome do cliente.');
   const { error } = await sb.from('warranty_customers').insert(payload); if(error) return fail(error);
-  clear(['customer_name','customer_whatsapp','customer_email','customer_document','customer_notes']); toast('Cliente salvo.'); await loadAll();
+  clear(['customer_name','customer_whatsapp','customer_country','customer_language','customer_notes']);
+  document.getElementById('customerGeoCard').style.display='none';
+  toast(state.supportsCustomerGeo ? 'Cliente salvo.' : 'Cliente salvo. Se quiser gravar país/idioma no banco, aplique o SQL complementar.');
+  await loadAll();
 }
 async function saveAccount(){
   const payload = { label: val('account_label'), login: val('account_login'), password: val('account_password'), provider: val('account_provider'), acquisition_cost: num('account_cost'), status: val('account_status'), acquired_at: val('account_acquired_at') || null, notes: val('account_notes') };
@@ -323,6 +344,39 @@ function fail(error){ console.error(error); toast(error.message || 'Erro no Supa
 function val(id){ return document.getElementById(id).value.trim(); }
 function num(id){ const v = val(id); return v ? Number(v) : null; }
 function clear(ids){ ids.forEach(id=>document.getElementById(id).value=''); }
+function normalizeWhatsapp(raw){ return String(raw||'').replace(/[^\d+]/g,'').trim(); }
+function flagFromCountryCode(code){
+  if(!code || code.length !== 2) return '🌍';
+  return code.toUpperCase().split('').map(ch => String.fromCodePoint(127397 + ch.charCodeAt(0))).join('');
+}
+function detectCountryMeta(raw){
+  const digits = normalizeWhatsapp(raw).replace(/^\+/, '');
+  const rules = [
+    ['55','BR','Brasil','Português'],['351','PT','Portugal','Português'],['1','US','Estados Unidos','Inglês'],['44','GB','Reino Unido','Inglês'],
+    ['34','ES','Espanha','Espanhol'],['52','MX','México','Espanhol'],['54','AR','Argentina','Espanhol'],['56','CL','Chile','Espanhol'],
+    ['57','CO','Colômbia','Espanhol'],['58','VE','Venezuela','Espanhol'],['51','PE','Peru','Espanhol'],['593','EC','Equador','Espanhol'],
+    ['595','PY','Paraguai','Espanhol'],['598','UY','Uruguai','Espanhol'],['591','BO','Bolívia','Espanhol'],['49','DE','Alemanha','Alemão'],
+    ['33','FR','França','Francês'],['39','IT','Itália','Italiano']
+  ].sort((a,b)=>b[0].length-a[0].length);
+  const found = rules.find(([prefix]) => digits.startsWith(prefix));
+  if(!found) return { countryCode:'', countryName:'', flag:'', language:'' };
+  const [, countryCode, countryName, language] = found;
+  return { countryCode, countryName, language, flag: flagFromCountryCode(countryCode) };
+}
+function handleWhatsappInput(){
+  const geo = detectCountryMeta(val('customer_whatsapp'));
+  document.getElementById('customer_country').value = geo.countryName ? `${geo.flag} ${geo.countryName}` : '';
+  document.getElementById('customer_language').value = geo.language || '';
+  const card = document.getElementById('customerGeoCard');
+  const txt = document.getElementById('customerGeoText');
+  if(geo.countryName){
+    txt.textContent = `${geo.flag} ${geo.countryName} · ${geo.language}`;
+    card.style.display = 'block';
+  } else {
+    txt.textContent = '—';
+    card.style.display = 'none';
+  }
+}
 function switchTab(name){ document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===name)); document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden')); document.getElementById('tab-'+name).classList.remove('hidden'); }
 function unlockApp(){ if(document.getElementById('pinInput').value !== APP_PIN) return toast('PIN inválido.'); localStorage.setItem('warranty_hub_ok','1'); document.getElementById('loginView').classList.add('hidden'); document.getElementById('appView').classList.remove('hidden'); loadAll(); }
 function logout(){ localStorage.removeItem('warranty_hub_ok'); location.reload(); }

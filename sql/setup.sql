@@ -16,10 +16,19 @@ create table if not exists public.warranty_customers (
   whatsapp text,
   email text,
   document_ref text,
+  country_code text,
+  country_name text,
+  country_flag text,
+  language text,
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.warranty_customers add column if not exists country_code text;
+alter table public.warranty_customers add column if not exists country_name text;
+alter table public.warranty_customers add column if not exists country_flag text;
+alter table public.warranty_customers add column if not exists language text;
 
 create table if not exists public.warranty_accounts (
   id uuid primary key default gen_random_uuid(),
