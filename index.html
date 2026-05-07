@@ -344,27 +344,55 @@ function fail(error){ console.error(error); toast(error.message || 'Erro no Supa
 function val(id){ return document.getElementById(id).value.trim(); }
 function num(id){ const v = val(id); return v ? Number(v) : null; }
 function clear(ids){ ids.forEach(id=>document.getElementById(id).value=''); }
-function normalizeWhatsapp(raw){ return String(raw||'').replace(/[^\d+]/g,'').trim(); }
+function normalizeWhatsapp(raw){ return String(raw||'').replace(/[^\d]/g,'').trim(); }
 function flagFromCountryCode(code){
   if(!code || code.length !== 2) return '🌍';
   return code.toUpperCase().split('').map(ch => String.fromCodePoint(127397 + ch.charCodeAt(0))).join('');
 }
+function formatWhatsappInput(raw){
+  const digits = normalizeWhatsapp(raw).slice(0, 15);
+  if(!digits) return '';
+  const ccLen = digits.startsWith('55') ? 2 : (digits.startsWith('1') ? 1 : (digits.length > 11 ? 3 : 2));
+  const cc = digits.slice(0, ccLen);
+  const rest = digits.slice(ccLen);
+  if(!rest) return `+${cc}`;
+  if(cc === '55'){
+    const ddd = rest.slice(0,2);
+    const first = rest.length > 10 ? rest.slice(2,7) : rest.slice(2,6);
+    const last = rest.length > 10 ? rest.slice(7,11) : rest.slice(6,10);
+    return `+${cc} ${ddd}${first ? ' ' + first : ''}${last ? '-' + last : ''}`.trim();
+  }
+  if(cc === '1'){
+    const a = rest.slice(0,3), b = rest.slice(3,6), c = rest.slice(6,10);
+    return `+${cc}${a ? ' ('+a+')' : ''}${b ? ' ' + b : ''}${c ? '-' + c : ''}`.trim();
+  }
+  const a = rest.slice(0,2), b = rest.slice(2,6), c = rest.slice(6,10), d = rest.slice(10,14);
+  return `+${cc}${a ? ' ' + a : ''}${b ? ' ' + b : ''}${c ? '-' + c : ''}${d ? ' ' + d : ''}`.trim();
+}
 function detectCountryMeta(raw){
-  const digits = normalizeWhatsapp(raw).replace(/^\+/, '');
+  const digits = normalizeWhatsapp(raw);
   const rules = [
-    ['55','BR','Brasil','Português'],['351','PT','Portugal','Português'],['1','US','Estados Unidos','Inglês'],['44','GB','Reino Unido','Inglês'],
-    ['34','ES','Espanha','Espanhol'],['52','MX','México','Espanhol'],['54','AR','Argentina','Espanhol'],['56','CL','Chile','Espanhol'],
-    ['57','CO','Colômbia','Espanhol'],['58','VE','Venezuela','Espanhol'],['51','PE','Peru','Espanhol'],['593','EC','Equador','Espanhol'],
-    ['595','PY','Paraguai','Espanhol'],['598','UY','Uruguai','Espanhol'],['591','BO','Bolívia','Espanhol'],['49','DE','Alemanha','Alemão'],
-    ['33','FR','França','Francês'],['39','IT','Itália','Italiano']
+    ['351','PT','Portugal','Português'],['244','AO','Angola','Português'],['258','MZ','Moçambique','Português'],['238','CV','Cabo Verde','Português'],
+    ['245','GW','Guiné-Bissau','Português'],['239','ST','São Tomé e Príncipe','Português'],['670','TL','Timor-Leste','Português'],['55','BR','Brasil','Português'],
+    ['44','GB','Reino Unido','Inglês'],['1','US','Estados Unidos / Canadá','Inglês'],['34','ES','Espanha','Espanhol'],['52','MX','México','Espanhol'],
+    ['54','AR','Argentina','Espanhol'],['56','CL','Chile','Espanhol'],['57','CO','Colômbia','Espanhol'],['58','VE','Venezuela','Espanhol'],
+    ['51','PE','Peru','Espanhol'],['593','EC','Equador','Espanhol'],['595','PY','Paraguai','Espanhol'],['598','UY','Uruguai','Espanhol'],
+    ['591','BO','Bolívia','Espanhol'],['507','PA','Panamá','Espanhol'],['506','CR','Costa Rica','Espanhol'],['502','GT','Guatemala','Espanhol'],
+    ['503','SV','El Salvador','Espanhol'],['504','HN','Honduras','Espanhol'],['505','NI','Nicarágua','Espanhol'],['53','CU','Cuba','Espanhol'],
+    ['49','DE','Alemanha','Alemão'],['33','FR','França','Francês'],['39','IT','Itália','Italiano'],['31','NL','Países Baixos','Holandês'],
+    ['32','BE','Bélgica','Francês / Holandês'],['41','CH','Suíça','Multilíngue'],['43','AT','Áustria','Alemão'],['353','IE','Irlanda','Inglês'],
+    ['61','AU','Austrália','Inglês'],['64','NZ','Nova Zelândia','Inglês'],['81','JP','Japão','Japonês'],['82','KR','Coreia do Sul','Coreano']
   ].sort((a,b)=>b[0].length-a[0].length);
   const found = rules.find(([prefix]) => digits.startsWith(prefix));
   if(!found) return { countryCode:'', countryName:'', flag:'', language:'' };
-  const [, countryCode, countryName, language] = found;
-  return { countryCode, countryName, language, flag: flagFromCountryCode(countryCode) };
+  const [dialCode, countryCode, countryName, language] = found;
+  return { dialCode, countryCode, countryName, language, flag: flagFromCountryCode(countryCode) };
 }
 function handleWhatsappInput(){
-  const geo = detectCountryMeta(val('customer_whatsapp'));
+  const input = document.getElementById('customer_whatsapp');
+  const digitsBefore = normalizeWhatsapp(input.value);
+  input.value = formatWhatsappInput(input.value);
+  const geo = detectCountryMeta(digitsBefore);
   document.getElementById('customer_country').value = geo.countryName ? `${geo.flag} ${geo.countryName}` : '';
   document.getElementById('customer_language').value = geo.language || '';
   const card = document.getElementById('customerGeoCard');
