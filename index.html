@@ -152,8 +152,8 @@
               <div class="glass panel">
                 <div class="section-title">
                   <div>
-                    <h2>Garantias ativas e vencimentos</h2>
-                    <p>Visão rápida para agir antes do cliente cobrar.</p>
+                    <h2 id="activeWarrantyTitle">Garantias ativas e vencimentos</h2>
+                    <p id="activeWarrantySubtitle">Visão rápida para agir antes do cliente cobrar.</p>
                   </div>
                 </div>
                 <div class="table-shell" id="salesTableWrap"></div>
@@ -161,11 +161,11 @@
             </div>
             <div>
               <div class="glass panel">
-                <div class="section-title"><div><h2>Alertas operacionais</h2><p>O que merece atenção agora.</p></div></div>
+                <div class="section-title"><div><h2 id="alertsTitle">Alertas operacionais</h2><p id="alertsSubtitle">O que merece atenção agora.</p></div></div>
                 <div id="alertsList" class="list"></div>
               </div>
               <div class="glass panel">
-                <div class="section-title"><div><h2>Resumo gerencial</h2><p>Indicadores rápidos de operação.</p></div></div>
+                <div class="section-title"><div><h2 id="summaryTitle">Resumo gerencial</h2><p id="summarySubtitle">Indicadores rápidos de operação.</p></div></div>
                 <div id="managerSummary" class="list"></div>
               </div>
             </div>
@@ -278,22 +278,41 @@ const I18N = {
     sidebarNote:'A garantia sempre segue a <strong>compra original</strong>. Reposição não reinicia prazo.', topbarEyebrow:'Central operacional', topbarTitle:'Central de Garantias',
     refreshBtn:'<i class="fa-solid fa-rotate-right"></i> Atualizar', logoutBtn:'<i class="fa-solid fa-right-from-bracket"></i> Sair',
     dashSearchTitle:'Busca operacional por cliente ou conta', dashSearchSubtitle:'Digite nome, WhatsApp, conta original ou conta de reposição.',
-    dashboardSearchPlaceholder:'Ex.: Túlio, 85987280047, conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> Limpar'
+    dashboardSearchPlaceholder:'Ex.: Túlio, 85987280047, conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> Limpar',
+    alertsTitle:'Alertas operacionais', alertsSubtitle:'O que merece atenção agora.', summaryTitle:'Resumo gerencial', summarySubtitle:'Indicadores rápidos de operação.',
+    activeWarrantyTitle:'Garantias ativas e vencimentos', activeWarrantySubtitle:'Visão rápida para agir antes do cliente cobrar.',
+    kpiActive:'Garantias ativas', kpiActiveFoot:'Compras ainda dentro do prazo original', kpiExpiring:'Vencendo em 3 dias', kpiExpiringFoot:'Clientes que exigem atenção imediata',
+    kpiAvailable:'Contas disponíveis', kpiAvailableFoot:'Estoque pronto para novas vendas ou trocas', kpiReplacements:'Reposições registradas', kpiReplacementsFoot:'Histórico acumulado de trocas',
+    alertSoonSuffix:'perto do vencimento', alertSoonBody:'Garantia vence em {days} dia(s).', alertManySuffix:'com muitas reposições', alertManyBody:'Já recebeu {count} troca(s). Vale revisar qualidade/uso.',
+    allGoodTitle:'Tudo sob controle', allGoodBody:'Nenhum alerta crítico agora.', chipAttention:'Atenção', chipCritical:'Crítico', chipOk:'Ok',
+    summaryOverdue:'Garantias vencidas', summaryOverdueBody:'{count} registro(s) já passaram do prazo original.', summaryBase:'Base principal', summaryBaseBody:'{count} cliente(s) atualmente detectados em português.', summaryPressure:'Maior pressão de trocas', summaryPressureEmpty:'Sem dados suficientes ainda.', summaryPressureBody:'{name} com {count} reposição(ões).',
+    emptySearch:'Busque por cliente, WhatsApp ou qualquer conta para enxergar a compra original, o prazo da garantia e todas as reposições ligadas.', emptyNoResult:'Nenhum resultado encontrado para essa busca.',
+    resultContact:'Contato', resultCountryFallback:'País não identificado', resultOriginal:'Conta original', resultWarrantyDays:'dias de garantia', resultRemaining:'Faltam {days} dias', resultExpired:'Venceu há {days} dias', resultReplacements:'Reposições desta compra', resultNoReplacements:'Nenhuma reposição nessa compra.', resultMatchedReplacement:'Busca bateu numa reposição entregue em {date} · vence em {end}'
   },
   'ur-PK': {
     sidebarEyebrow:'آپریشنل پینل', sidebarTitle:'وارنٹیز', navDashboard:'ڈیش بورڈ', navCustomers:'گاہک', navAccounts:'اکاؤنٹس', navSales:'فروخت',
     sidebarNote:'وارنٹی ہمیشہ <strong>اصل خریداری</strong> کے ساتھ جڑی رہتی ہے۔ متبادل سے مدت دوبارہ شروع نہیں ہوتی۔', topbarEyebrow:'آپریشنل مرکز', topbarTitle:'سینٹرل آف وارنٹیز',
     refreshBtn:'<i class="fa-solid fa-rotate-right"></i> تازہ کریں', logoutBtn:'<i class="fa-solid fa-right-from-bracket"></i> باہر نکلیں',
     dashSearchTitle:'گاہک یا اکاؤنٹ کے لحاظ سے تلاش', dashSearchSubtitle:'نام، واٹس ایپ، اصل اکاؤنٹ یا متبادل اکاؤنٹ لکھیں۔',
-    dashboardSearchPlaceholder:'مثال: Tulio، 85987280047، conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> صاف کریں'
+    dashboardSearchPlaceholder:'مثال: Tulio، 85987280047، conta03@gmail.com', clearSearchBtn:'<i class="fa-solid fa-broom"></i> صاف کریں',
+    alertsTitle:'آپریشنل الرٹس', alertsSubtitle:'ابھی کس چیز پر توجہ دینی ہے۔', summaryTitle:'انتظامی خلاصہ', summarySubtitle:'آپریشن کے فوری اشارے۔',
+    activeWarrantyTitle:'فعال وارنٹیز اور اختتامی تاریخیں', activeWarrantySubtitle:'گاہک کے پوچھنے سے پہلے فوری نظر۔',
+    kpiActive:'فعال وارنٹیز', kpiActiveFoot:'وہ خریداری جو اب بھی اصل مدت کے اندر ہے', kpiExpiring:'3 دن میں ختم ہونے والی', kpiExpiringFoot:'وہ گاہک جن پر فوری توجہ چاہیے',
+    kpiAvailable:'دستیاب اکاؤنٹس', kpiAvailableFoot:'نئی فروخت یا تبدیلی کے لیے تیار اسٹاک', kpiReplacements:'رجسٹر شدہ متبادل', kpiReplacementsFoot:'متبادلوں کی مجموعی ہسٹری',
+    alertSoonSuffix:'جلد ختم ہونے والی', alertSoonBody:'وارنٹی {days} دن میں ختم ہوگی۔', alertManySuffix:'بہت زیادہ متبادل کے ساتھ', alertManyBody:'اسے پہلے ہی {count} تبدیلیاں مل چکی ہیں۔ معیار یا استعمال دیکھیں۔',
+    allGoodTitle:'سب کنٹرول میں ہے', allGoodBody:'اس وقت کوئی اہم الرٹ نہیں۔', chipAttention:'توجہ', chipCritical:'اہم', chipOk:'ٹھیک',
+    summaryOverdue:'ختم شدہ وارنٹیز', summaryOverdueBody:'{count} ریکارڈ اصل مدت سے گزر چکے ہیں۔', summaryBase:'بنیادی بیس', summaryBaseBody:'اس وقت {count} گاہک پرتگالی میں شناخت ہوئے ہیں۔', summaryPressure:'سب سے زیادہ تبدیلی کا دباؤ', summaryPressureEmpty:'ابھی کافی ڈیٹا نہیں۔', summaryPressureBody:'{name} کے ساتھ {count} متبادل۔',
+    emptySearch:'گاہک، واٹس ایپ یا کوئی بھی اکاؤنٹ تلاش کریں تاکہ اصل خریداری، وارنٹی کی مدت اور جڑی ہوئی تمام تبدیلیاں دیکھی جا سکیں۔', emptyNoResult:'اس تلاش کے لیے کوئی نتیجہ نہیں ملا۔',
+    resultContact:'رابطہ', resultCountryFallback:'ملک شناخت نہیں ہوا', resultOriginal:'اصل اکاؤنٹ', resultWarrantyDays:'دن کی وارنٹی', resultRemaining:'{days} دن باقی ہیں', resultExpired:'{days} دن پہلے ختم ہوئی', resultReplacements:'اس خریداری کے متبادل', resultNoReplacements:'اس خریداری میں کوئی متبادل نہیں۔', resultMatchedReplacement:'تلاش ایک متبادل سے ملی جو {date} کو دیا گیا تھا · اختتام {end}'
   }
 };
 
 const $ = id => document.getElementById(id);
 function toast(msg){ const el=$('toast'); el.textContent=msg; el.style.display='block'; clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>el.style.display='none',3200); }
+function tr(key, vars={}){ const t = I18N[state.language] || I18N['pt-BR']; let s = t[key] || I18N['pt-BR'][key] || key; Object.entries(vars).forEach(([k,v]) => { s = s.replaceAll(`{${k}}`, v); }); return s; }
 function applyLanguage(){
   const t = I18N[state.language] || I18N['pt-BR'];
-  const textIds = ['sidebarEyebrow','sidebarTitle','navDashboard','navCustomers','navAccounts','navSales','topbarEyebrow','topbarTitle','dashSearchTitle','dashSearchSubtitle'];
+  const textIds = ['sidebarEyebrow','sidebarTitle','navDashboard','navCustomers','navAccounts','navSales','topbarEyebrow','topbarTitle','dashSearchTitle','dashSearchSubtitle','alertsTitle','alertsSubtitle','summaryTitle','summarySubtitle','activeWarrantyTitle','activeWarrantySubtitle'];
   textIds.forEach(id => { const el = $(id); if(el && t[id]) el.textContent = t[id]; });
   if($('sidebarNote')) $('sidebarNote').innerHTML = t.sidebarNote;
   if($('refreshBtn')) $('refreshBtn').innerHTML = t.refreshBtn;
@@ -303,6 +322,7 @@ function applyLanguage(){
   if($('languageSelect')) $('languageSelect').value = state.language;
   document.documentElement.lang = state.language === 'ur-PK' ? 'ur' : 'pt-BR';
   document.body.dir = state.language === 'ur-PK' ? 'rtl' : 'ltr';
+  renderKpis(); renderDashboard(); renderManagerSummary(); renderDashboardSearch();
 }
 function setLanguage(lang){ state.language = lang; localStorage.setItem('garantia_hub_lang', lang); applyLanguage(); }
 function money(v){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
@@ -392,10 +412,10 @@ function renderKpis(){
   const available = state.accounts.filter(a => a.status === 'available').length;
   const replacements = state.replacements.length;
   const cards = [
-    ['Garantias ativas', active, 'Compras ainda dentro do prazo original', 'fa-shield-heart'],
-    ['Vencendo em 3 dias', expiring, 'Clientes que exigem atenção imediata', 'fa-clock'],
-    ['Contas disponíveis', available, 'Estoque pronto para novas vendas ou trocas', 'fa-key'],
-    ['Reposições registradas', replacements, 'Histórico acumulado de trocas', 'fa-rotate']
+    [tr('kpiActive'), active, tr('kpiActiveFoot'), 'fa-shield-heart'],
+    [tr('kpiExpiring'), expiring, tr('kpiExpiringFoot'), 'fa-clock'],
+    [tr('kpiAvailable'), available, tr('kpiAvailableFoot'), 'fa-key'],
+    [tr('kpiReplacements'), replacements, tr('kpiReplacementsFoot'), 'fa-rotate']
   ];
   $('kpis').innerHTML = cards.map(([title,value,foot,icon])=>`<div class="glass stat-card"><div class="stat-label"><i class="fa-solid ${icon}" style="margin-right:8px;color:#80c7ff"></i>${title}</div><div class="stat-value">${value}</div><div class="stat-foot">${foot}</div></div>`).join('');
 }
@@ -403,11 +423,11 @@ function renderDashboard(){
   const alerts = [];
   state.sales.forEach(s=>{
     const c=customerById(s.customer_id), d=daysLeft(guaranteeEnd(s)), reps=replacementsBySale(s.id).length;
-    if(d !== null && d >=0 && d <=3) alerts.push({title:`${c.name || 'Cliente'} perto do vencimento`, body:`Garantia vence em ${d} dia(s).`, tone:'yellow'});
-    if(reps >= 2) alerts.push({title:`${c.name || 'Cliente'} com muitas reposições`, body:`Já recebeu ${reps} troca(s). Vale revisar qualidade/uso.`, tone:'red'});
+    if(d !== null && d >=0 && d <=3) alerts.push({title:`${c.name || 'Cliente'} ${tr('alertSoonSuffix')}`, body:tr('alertSoonBody',{days:d}), tone:'yellow'});
+    if(reps >= 2) alerts.push({title:`${c.name || 'Cliente'} ${tr('alertManySuffix')}`, body:tr('alertManyBody',{count:reps}), tone:'red'});
   });
-  if(!alerts.length) alerts.push({title:'Tudo sob controle', body:'Nenhum alerta crítico agora.', tone:'green'});
-  $('alertsList').innerHTML = alerts.map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.title}</div><div class="item-meta">${a.body}</div></div><span class="chip ${a.tone==='yellow'?'yellow':a.tone==='red'?'red':'green'}">${a.tone==='yellow'?'Atenção':a.tone==='red'?'Crítico':'Ok'}</span></div></div>`).join('');
+  if(!alerts.length) alerts.push({title:tr('allGoodTitle'), body:tr('allGoodBody'), tone:'green'});
+  $('alertsList').innerHTML = alerts.map(a=>`<div class="item"><div class="item-head"><div><div class="item-title">${a.title}</div><div class="item-meta">${a.body}</div></div><span class="chip ${a.tone==='yellow'?'yellow':a.tone==='red'?'red':'green'}">${a.tone==='yellow'?tr('chipAttention'):a.tone==='red'?tr('chipCritical'):tr('chipOk')}</span></div></div>`).join('');
   renderSalesTable();
 }
 function buildDashboardMatches(query){
@@ -432,12 +452,12 @@ function renderDashboardSearch(){
   if(!host) return;
   const q = val('dashboardSearch');
   if(!q){
-    host.innerHTML = '<div class="empty">Busque por cliente, WhatsApp ou qualquer conta para enxergar a compra original, o prazo da garantia e todas as reposições ligadas.</div>';
+    host.innerHTML = `<div class="empty">${tr('emptySearch')}</div>`;
     return;
   }
   const matches = buildDashboardMatches(q);
   if(!matches.length){
-    host.innerHTML = '<div class="empty">Nenhum resultado encontrado para essa busca.</div>';
+    host.innerHTML = `<div class="empty">${tr('emptyNoResult')}</div>`;
     return;
   }
   host.innerHTML = matches.map(s=>{
@@ -452,21 +472,21 @@ function renderDashboardSearch(){
       const hay = `${acc.label||''} ${acc.login||''}`.toLowerCase();
       return hay.includes(q.toLowerCase());
     });
-    const replacementNote = matchedReplacement ? `<div class="chip yellow" style="margin-bottom:10px">Busca bateu numa reposição entregue em ${fmtDate(matchedReplacement.replaced_at)} · vence em ${fmtDate(end)}</div>` : '';
-    const repsHtml = reps.length ? reps.map(r=>{ const a=accountById(r.replacement_account_id); return `<div class="item" style="padding:12px;margin-top:10px"><div class="item-title" style="font-size:.95rem">${a.login || a.label || 'Conta de reposição'}</div><div class="item-meta">Entregue ${fmtDate(r.replaced_at)}${r.reason ? ` · ${r.reason}` : ''}</div></div>`; }).join('') : '<div class="empty" style="margin-top:10px">Nenhuma reposição nessa compra.</div>';
+    const replacementNote = matchedReplacement ? `<div class="chip yellow" style="margin-bottom:10px">${tr('resultMatchedReplacement',{date:fmtDate(matchedReplacement.replaced_at), end:fmtDate(end)})}</div>` : '';
+    const repsHtml = reps.length ? reps.map(r=>{ const a=accountById(r.replacement_account_id); return `<div class="item" style="padding:12px;margin-top:10px"><div class="item-title" style="font-size:.95rem">${a.login || a.label || 'Conta de reposição'}</div><div class="item-meta">${state.language==='ur-PK' ? 'فراہم کی گئی' : 'Entregue'} ${fmtDate(r.replaced_at)}${r.reason ? ` · ${r.reason}` : ''}</div></div>`; }).join('') : `<div class="empty" style="margin-top:10px">${tr('resultNoReplacements')}</div>`;
     return `<div class="item" style="padding:18px 18px 16px">
       ${replacementNote}
       <div class="item-head">
         <div>
-          <div class="item-title" style="font-size:1.05rem">${c.name || 'Cliente'} - Contato ${c.whatsapp || 'sem número'} - ${flag} ${c.country_name || 'País não identificado'}</div>
+          <div class="item-title" style="font-size:1.05rem">${c.name || 'Cliente'} - ${tr('resultContact')} ${c.whatsapp || 'sem número'} - ${flag} ${c.country_name || tr('resultCountryFallback')}</div>
           <div class="item-meta" style="margin-top:8px">
-            <strong>${initial.login || initial.label || 'Conta original'}</strong> - ${s.warranty_days} dias de garantia - ${fmtDate(s.sold_at)} a ${fmtDate(end)} - ${d < 0 ? `Venceu há ${Math.abs(d)} dias` : `Faltam ${d} dias`}
+            <strong>${initial.login || initial.label || tr('resultOriginal')}</strong> - ${s.warranty_days} ${tr('resultWarrantyDays')} - ${fmtDate(s.sold_at)} a ${fmtDate(end)} - ${d < 0 ? tr('resultExpired',{days:Math.abs(d)}) : tr('resultRemaining',{days:d})}
           </div>
         </div>
         <div>${badgeByDays(d)}</div>
       </div>
       <div style="margin-top:14px">
-        <div class="eyebrow" style="font-size:.68rem">Reposições desta compra</div>
+        <div class="eyebrow" style="font-size:.68rem">${tr('resultReplacements')}</div>
         ${repsHtml}
       </div>
     </div>`;
@@ -478,9 +498,9 @@ function renderManagerSummary(){
   const pt = state.customers.filter(c => String(c.language||'').toLowerCase().includes('portugu')).length;
   const mostReplaced = [...state.sales].sort((a,b)=>replacementsBySale(b.id).length - replacementsBySale(a.id).length)[0];
   const rows = [
-    `<div class="item"><div class="item-title">Garantias vencidas</div><div class="item-meta">${overdue} registro(s) já passaram do prazo original.</div></div>`,
-    `<div class="item"><div class="item-title">Base principal</div><div class="item-meta">${pt} cliente(s) atualmente detectados em português.</div></div>`,
-    `<div class="item"><div class="item-title">Maior pressão de trocas</div><div class="item-meta">${mostReplaced ? `${customerById(mostReplaced.customer_id).name || 'Cliente'} com ${replacementsBySale(mostReplaced.id).length} reposição(ões).` : 'Sem dados suficientes ainda.'}</div></div>`
+    `<div class="item"><div class="item-title">${tr('summaryOverdue')}</div><div class="item-meta">${tr('summaryOverdueBody',{count:overdue})}</div></div>`,
+    `<div class="item"><div class="item-title">${tr('summaryBase')}</div><div class="item-meta">${tr('summaryBaseBody',{count:pt})}</div></div>`,
+    `<div class="item"><div class="item-title">${tr('summaryPressure')}</div><div class="item-meta">${mostReplaced ? tr('summaryPressureBody',{name: customerById(mostReplaced.customer_id).name || 'Cliente', count: replacementsBySale(mostReplaced.id).length}) : tr('summaryPressureEmpty')}</div></div>`
   ];
   $('managerSummary').innerHTML = rows.join('');
 }
