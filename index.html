@@ -37,6 +37,7 @@
     .btn-good{background:rgba(39,213,154,.16);color:#80f0c1;border:1px solid rgba(39,213,154,.18)}
     .app-shell{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start}
     .sidebar{position:sticky;top:18px;padding:18px;border-radius:28px}
+    .mobile-only{display:none}
     .sidebar .brand{margin-bottom:18px}
     .side-nav{display:grid;gap:10px;margin-top:18px}
     .side-btn{display:flex;align-items:center;gap:12px;padding:14px 14px;border-radius:16px;color:#dce9ff;background:transparent;border:1px solid transparent;cursor:pointer;font-weight:700}
@@ -67,14 +68,57 @@
     .item-title{font-weight:800;font-size:1rem}
     .item-meta{margin-top:6px;color:var(--muted);font-size:.86rem;line-height:1.55}
     .item-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .item-actions .btn{white-space:nowrap}
     .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:.76rem;font-weight:800}
     .chip.blue{background:rgba(73,168,255,.12);color:#9dd2ff}.chip.green{background:rgba(39,213,154,.12);color:#84efc5}.chip.yellow{background:rgba(244,196,83,.13);color:#ffd879}.chip.red{background:rgba(251,113,133,.12);color:#ffb1bf}
     table{width:100%;border-collapse:collapse}.table-shell{overflow:auto;border-radius:18px;border:1px solid rgba(255,255,255,.06)} th,td{padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;font-size:.9rem;vertical-align:top} th{font-size:.74rem;color:#a9c0e4;text-transform:uppercase;letter-spacing:.08em;background:#0d1629;position:sticky;top:0}
     .badge{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:.76rem;font-weight:800}.ok{background:rgba(39,213,154,.12);color:#86efc5}.warn{background:rgba(244,196,83,.12);color:#ffd97e}.bad{background:rgba(251,113,133,.12);color:#ffb5c2}
     .toast{position:fixed;right:18px;bottom:18px;padding:13px 14px;border-radius:14px;background:#10182a;border:1px solid rgba(255,255,255,.08);display:none;max-width:420px;z-index:40}
     .small{font-size:.84rem}.empty{padding:18px;border-radius:18px;background:#0e172b;color:var(--muted);border:1px dashed rgba(255,255,255,.08)}
-    @media (max-width:1180px){.app-shell{grid-template-columns:1fr}.sidebar{position:static}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (max-width:780px){.wrap{padding:14px}.grid-2,.form-grid,.stats{grid-template-columns:1fr}.topbar{padding:16px}.title{font-size:1.8rem}}
+    @media (max-width:1180px){
+      .app-shell{grid-template-columns:1fr}
+      .sidebar{position:static}
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .side-nav{grid-template-columns:repeat(4,minmax(0,1fr))}
+      .side-btn{justify-content:center}
+      .sidebar-note{display:none}
+    }
+    @media (max-width:780px){
+      .wrap{padding:12px}
+      .grid-2,.form-grid,.stats{grid-template-columns:1fr}
+      .topbar{padding:16px;flex-direction:column;align-items:stretch}
+      .topbar-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .topbar-actions .field,.topbar-actions .btn{width:100%;min-width:0!important}
+      .title{font-size:1.8rem}
+      .brand img{width:58px;height:58px;border-radius:16px}
+      .sidebar{padding:14px;border-radius:22px}
+      .side-nav{display:flex;overflow:auto;gap:10px;padding-bottom:4px;scrollbar-width:none}
+      .side-nav::-webkit-scrollbar{display:none}
+      .side-btn{min-width:max-content;padding:12px 14px}
+      .panel{padding:14px;border-radius:20px}
+      .section-title{align-items:flex-start;flex-direction:column}
+      .section-title h2{font-size:1rem}
+      .item{padding:14px;border-radius:18px}
+      .item-head{flex-direction:column}
+      .item-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      .item-actions .btn{width:100%;padding:11px 12px}
+      .table-shell{overflow-x:auto}
+      th,td{padding:12px 10px;font-size:.84rem}
+      #dashboardSearchResults .item-title{line-height:1.35}
+    }
+    @media (max-width:520px){
+      .login{margin:4vh auto 0}
+      .login-card{padding:22px;border-radius:22px}
+      .topbar-actions{grid-template-columns:1fr}
+      .item-actions{grid-template-columns:1fr}
+      .stats{gap:12px}
+      .stat-card{padding:16px}
+      .stat-value{font-size:1.7rem}
+      .field,select,textarea{padding:13px 13px}
+      .brand{gap:12px}
+      .eyebrow{font-size:.65rem}
+      .title{font-size:1.58rem}
+    }
   </style>
 </head>
 <body>
