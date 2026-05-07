@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Central de Garantias</title>
+  <meta name="description" content="Controle de clientes, contas, vendas e reposições dentro do prazo de garantia." />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#0b1020;--panel:#121a30;--panel2:#18223f;--text:#edf2ff;--muted:#9fb0d6;--line:#263456;
+      --accent:#6ea8fe;--good:#34d399;--warn:#fbbf24;--bad:#fb7185;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#08101d,#0f1630 45%,#111a36);color:var(--text)}
+    .wrap{max-width:1400px;margin:0 auto;padding:24px}
+    .hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}
+    .hero h1{margin:0;font-size:2rem}.hero p{color:var(--muted);max-width:820px}
+    .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:18px}
+    .card,.panel{background:rgba(18,26,48,.92);border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 38px rgba(0,0,0,.22)}
+    .card{padding:18px}.kpi{font-size:1.9rem;font-weight:800;margin-top:8px}.muted{color:var(--muted)}
+    .main{grid-template-columns:1.3fr .9fr}.panel{padding:18px}.panel h2{margin:0 0 12px;font-size:1.05rem}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{background:#0f1730;color:var(--muted);border:1px solid var(--line);padding:10px 14px;border-radius:999px;cursor:pointer}.tab.active{background:var(--accent);color:#08101d;border-color:transparent;font-weight:700}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select,.toolbar textarea,.toolbar button,.form input,.form select,.form textarea{width:100%;background:#0c1430;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:inherit}
+    button{cursor:pointer}.btn{background:var(--accent);color:#08101d;font-weight:800;border:none}.btn.secondary{background:#162242;color:var(--text);border:1px solid var(--line)}.btn.good{background:var(--good);color:#062918}
+    .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form .full{grid-column:1/-1}.hidden{display:none!important}
+    table{width:100%;border-collapse:collapse;font-size:.93rem} th,td{padding:12px 10px;border-bottom:1px solid rgba(159,176,214,.12);text-align:left;vertical-align:top} th{color:#c9d5f6;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+    .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:.77rem;font-weight:700}.ok{background:rgba(52,211,153,.12);color:#7ef0c7}.warn{background:rgba(251,191,36,.12);color:#ffd772}.bad{background:rgba(251,113,133,.12);color:#ff9aad}
+    .row-actions{display:flex;gap:8px;flex-wrap:wrap}.small{font-size:.82rem}.list{display:grid;gap:10px}.item{padding:14px;border:1px solid var(--line);border-radius:14px;background:#101935}
+    .login{max-width:430px;margin:9vh auto 0}.login .panel{padding:24px}.notice{padding:12px 14px;border-radius:14px;background:#132041;border:1px solid #28417b;color:#dbe7ff;margin-bottom:14px}
+    .toast{position:fixed;right:16px;bottom:16px;padding:12px 14px;border-radius:12px;background:#0f1730;border:1px solid var(--line);display:none;max-width:420px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86rem}
+    @media (max-width:980px){.main,.form{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div id="loginView" class="wrap login">
+    <div class="panel">
+      <div class="notice">MVP inicial para controle de garantias. Os dados ficam em tabelas próprias no Supabase, sem misturar com a operação BoxPower.</div>
+      <h1>Central de Garantias</h1>
+      <p class="muted">Cadastre clientes, contas, vendas iniciais e reposições sem perder a data-base da garantia original.</p>
+      <div class="form" style="grid-template-columns:1fr; margin-top:16px;">
+        <input id="pinInput" type="password" placeholder="PIN de acesso" />
+        <button class="btn" onclick="unlockApp()">Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appView" class="wrap hidden">
+    <div class="hero">
+      <div>
+        <h1>Central de Garantias</h1>
+        <p>Controle de contas com garantia, reposições vinculadas à compra original e histórico completo por cliente.</p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; min-width:280px;">
+        <button class="btn secondary" onclick="loadAll()">Atualizar</button>
+        <button class="btn secondary" onclick="logout()">Sair</button>
+      </div>
+    </div>
+
+    <div class="grid cards" id="kpis"></div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+      <button class="tab" data-tab="customers" onclick="switchTab('customers')">Clientes</button>
+      <button class="tab" data-tab="accounts" onclick="switchTab('accounts')">Contas</button>
+      <button class="tab" data-tab="sales" onclick="switchTab('sales')">Vendas</button>
+      <button class="tab" data-tab="replacements" onclick="switchTab('replacements')">Reposições</button>
+      <button class="tab" data-tab="sql" onclick="switchTab('sql')">Setup SQL</button>
+    </div>
+
+    <section id="tab-dashboard" class="tab-body">
+      <div class="grid main">
+        <div class="panel">
+          <h2>Garantias ativas e vencimentos</h2>
+          <div id="salesTableWrap"></div>
+        </div>
+        <div class="panel">
+          <h2>Próximas ações</h2>
+          <div id="alertsList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-customers" class="tab-body hidden">
+      <div class="grid main">
+        <div class="panel">
+          <h2>Novo cliente</h2>
+          <div class="form">
+            <input id="customer_name" placeholder="Nome do cliente" />
+            <input id="customer_whatsapp" placeholder="WhatsApp" />
+            <input id="customer_email" placeholder="E-mail" />
+            <input id="customer_document" placeholder="Documento / referência" />
+            <textarea id="customer_notes" class="full" rows="4" placeholder="Observações"></textarea>
+            <button class="btn full" onclick="saveCustomer()">Salvar cliente</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="toolbar"><input id="customerSearch" placeholder="Buscar por nome, WhatsApp ou e-mail" oninput="renderCustomers()" /></div>
+          <div id="customersList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-accounts" class="tab-body hidden">
+      <div class="grid main">
+        <div class="panel">
+          <h2>Nova conta</h2>
+          <div class="form">
+            <input id="account_label" placeholder="Nome interno da conta" />
+            <input id="account_login" placeholder="Login / e-mail" />
+            <input id="account_password" placeholder="Senha" />
+            <input id="account_provider" placeholder="Fornecedor / origem" />
+            <input id="account_cost" type="number" step="0.01" placeholder="Custo (R$)" />
+            <select id="account_status"><option value="available">Disponível</option><option value="sold">Vendida</option><option value="in_warranty">Em garantia</option><option value="replaced">Substituída</option><option value="blocked">Bloqueada</option></select>
+            <input id="account_acquired_at" type="date" />
+            <textarea id="account_notes" class="full" rows="4" placeholder="Observações"></textarea>
+            <button class="btn full" onclick="saveAccount()">Salvar conta</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="toolbar"><input id="accountSearch" placeholder="Buscar por login, nome ou fornecedor" oninput="renderAccounts()" /></div>
+          <div id="accountsList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-sales" class="tab-body hidden">
+      <div class="grid main">
+        <div class="panel">
+          <h2>Registrar venda inicial</h2>
+          <div class="form">
+            <select id="sale_customer_id"></select>
+            <select id="sale_initial_account_id"></select>
+            <input id="sale_sold_at" type="date" />
+            <input id="sale_warranty_days" type="number" min="1" value="30" placeholder="Dias de garantia" />
+            <input id="sale_price" type="number" step="0.01" placeholder="Preço de venda (R$)" />
+            <select id="sale_status"><option value="active">Ativa</option><option value="expired">Expirada</option><option value="cancelled">Cancelada</option></select>
+            <textarea id="sale_notes" class="full" rows="4" placeholder="Observações da venda"></textarea>
+            <button class="btn full" onclick="saveSale()">Salvar venda</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="toolbar"><input id="salesSearch" placeholder="Buscar por cliente, login ou status" oninput="renderSales()" /></div>
+          <div id="salesList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-replacements" class="tab-body hidden">
+      <div class="grid main">
+        <div class="panel">
+          <h2>Registrar reposição</h2>
+          <div class="notice small">A garantia continua valendo a partir da compra original. Registrar uma reposição não reinicia o prazo.</div>
+          <div class="form">
+            <select id="replacement_sale_id"></select>
+            <select id="replacement_account_id"></select>
+            <input id="replacement_replaced_at" type="date" />
+            <input id="replacement_reason" placeholder="Motivo da reposição" />
+            <textarea id="replacement_notes" class="full" rows="4" placeholder="Observações"></textarea>
+            <button class="btn good full" onclick="saveReplacement()">Salvar reposição</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div id="replacementsList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-sql" class="tab-body hidden">
+      <div class="panel">
+        <h2>Setup SQL</h2>
+        <p class="muted">Se as tabelas ainda não existirem, aplique o arquivo <span class="mono">sql/setup.sql</span> no Supabase. O site usa apenas tabelas prefixed com <span class="mono">warranty_</span>.</p>
+        <div class="notice small">Como eu ainda não encontrei um canal direto de DDL nessa VPS, deixei a migration pronta e isolada. Assim que o SQL for aplicado, o app já passa a operar no Supabase.</div>
+        <pre id="sqlPreview" class="mono" style="white-space:pre-wrap; background:#091124; padding:16px; border-radius:14px; border:1px solid var(--line); max-height:520px; overflow:auto"></pre>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://epwmoicgvuprzkcpxjoy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues';
+const APP_PIN = '5425';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
+const state = { customers: [], accounts: [], sales: [], replacements: [] };
+
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',3200); }
+function money(v){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v||0)); }
+function fmtDate(v){ if(!v) return '—'; const d=new Date(v+'T12:00:00'); return d.toLocaleDateString('pt-BR'); }
+function addDays(dateStr, days){ const d=new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+Number(days||0)); return d; }
+function isoDate(d){ return d.toISOString().slice(0,10); }
+function guaranteeEnd(sale){ return sale.sold_at ? isoDate(addDays(sale.sold_at, Number(sale.warranty_days||0))) : null; }
+function daysLeft(endDate){ if(!endDate) return null; const now=new Date(); now.setHours(0,0,0,0); const end=new Date(endDate+'T12:00:00'); return Math.ceil((end-now)/86400000); }
+function badgeByDays(n){ if(n === null) return '<span class="badge warn">Sem data</span>'; if(n < 0) return `<span class="badge bad">Vencida há ${Math.abs(n)}d</span>`; if(n <= 3) return `<span class="badge warn">Vence em ${n}d</span>`; return `<span class="badge ok">Ativa · ${n}d</span>`; }
+function customerById(id){ return state.customers.find(x=>x.id===id) || {}; }
+function accountById(id){ return state.accounts.find(x=>x.id===id) || {}; }
+function replacementsBySale(saleId){ return state.replacements.filter(r=>r.sale_id===saleId).sort((a,b)=>String(b.replaced_at).localeCompare(String(a.replaced_at))); }
+function currentAccountForSale(sale){ const reps = replacementsBySale(sale.id); return reps[0]?.replacement_account_id || sale.initial_account_id; }
+
+async function fetchTable(table, order='created_at'){ const { data, error } = await sb.from(table).select('*').order(order,{ascending:false}); if(error) throw error; return data || []; }
+async function loadAll(){
+  try{
+    state.customers = await fetchTable('warranty_customers');
+    state.accounts = await fetchTable('warranty_accounts');
+    state.sales = await fetchTable('warranty_sales','sold_at');
+    state.replacements = await fetchTable('warranty_replacements','replaced_at');
+    fillSelectors(); renderAll();
+  }catch(err){ console.error(err); toast('Falha ao carregar. Se for a primeira vez, aplique o SQL de setup.'); }
+}
+function fillSelectors(){
+  const customerOpts = ['<option value="">Selecione o cliente</option>'].concat(state.customers.map(c=>`<option value="${c.id}">${c.name}${c.whatsapp ? ' · '+c.whatsapp : ''}</option>`));
+  document.getElementById('sale_customer_id').innerHTML = customerOpts.join('');
+  const accountOpts = ['<option value="">Selecione a conta</option>'].concat(state.accounts.map(a=>`<option value="${a.id}">${a.label || a.login} · ${a.status}</option>`));
+  document.getElementById('sale_initial_account_id').innerHTML = accountOpts.join('');
+  document.getElementById('replacement_account_id').innerHTML = accountOpts.join('');
+  const saleOpts = ['<option value="">Selecione a venda</option>'].concat(state.sales.map(s=>{ const c=customerById(s.customer_id); return `<option value="${s.id}">${c.name || 'Cliente'} · ${fmtDate(s.sold_at)} · ${guaranteeEnd(s)}</option>`; }));
+  document.getElementById('replacement_sale_id').innerHTML = saleOpts.join('');
+}
+function renderAll(){ renderKpis(); renderSales(); renderCustomers(); renderAccounts(); renderReplacements(); renderDashboard(); }
+function renderKpis(){
+  const active = state.sales.filter(s=> (daysLeft(guaranteeEnd(s)) ?? -999) >= 0).length;
+  const expiring = state.sales.filter(s=> { const d=daysLeft(guaranteeEnd(s)); return d!==null && d>=0 && d<=3; }).length;
+  const available = state.accounts.filter(a=>a.status==='available').length;
+  const replacements = state.replacements.length;
+  const cards = [
+    ['Garantias ativas', active, 'Compras ainda dentro do prazo original'],
+    ['Vencendo em 3 dias', expiring, 'Ótimo ponto de atenção pro fornecedor'],
+    ['Contas disponíveis', available, 'Estoque pronto para reposição'],
+    ['Reposições registradas', replacements, 'Histórico total de trocas']
+  ];
+  document.getElementById('kpis').innerHTML = cards.map(([t,v,s])=>`<div class="card"><div class="muted">${t}</div><div class="kpi">${v}</div><div class="small muted">${s}</div></div>`).join('');
+}
+function renderDashboard(){
+  const alerts = [];
+  state.sales.forEach(s=>{
+    const c = customerById(s.customer_id), d = daysLeft(guaranteeEnd(s)), reps = replacementsBySale(s.id).length;
+    if(d !== null && d >= 0 && d <= 3) alerts.push({title:`${c.name || 'Cliente'} com garantia perto do fim`, body:`Vence em ${d} dia(s).`});
+    if(reps >= 2) alerts.push({title:`${c.name || 'Cliente'} já teve ${reps} reposições`, body:'Vale acompanhar a qualidade da conta ou o padrão de uso.'});
+  });
+  if(!alerts.length) alerts.push({title:'Tudo sob controle', body:'Nenhum alerta crítico agora.'});
+  document.getElementById('alertsList').innerHTML = alerts.map(a=>`<div class="item"><strong>${a.title}</strong><div class="small muted" style="margin-top:6px">${a.body}</div></div>`).join('');
+  renderSalesTable();
+}
+function renderSalesTable(){
+  const rows = state.sales.slice().sort((a,b)=>String(a.sold_at).localeCompare(String(b.sold_at))).reverse().map(s=>{
+    const c = customerById(s.customer_id), acc = accountById(currentAccountForSale(s)), end=guaranteeEnd(s), d=daysLeft(end), reps = replacementsBySale(s.id).length;
+    return `<tr><td><strong>${c.name || '—'}</strong><div class="small muted">${c.whatsapp || c.email || ''}</div></td><td>${acc.label || acc.login || '—'}</td><td>${fmtDate(s.sold_at)}</td><td>${fmtDate(end)}</td><td>${badgeByDays(d)}</td><td>${reps}</td></tr>`;
+  }).join('');
+  document.getElementById('salesTableWrap').innerHTML = `<table><thead><tr><th>Cliente</th><th>Conta atual</th><th>Compra</th><th>Garantia até</th><th>Status</th><th>Reposições</th></tr></thead><tbody>${rows || '<tr><td colspan="6" class="muted">Sem vendas ainda.</td></tr>'}</tbody></table>`;
+}
+function renderCustomers(){
+  const q = document.getElementById('customerSearch')?.value?.toLowerCase() || '';
+  const items = state.customers.filter(c=>`${c.name} ${c.whatsapp||''} ${c.email||''}`.toLowerCase().includes(q)).map(c=>`<div class="item"><strong>${c.name}</strong><div class="small muted">${c.whatsapp||'Sem WhatsApp'} · ${c.email||'Sem e-mail'}</div><div class="small muted" style="margin-top:6px">${c.notes||''}</div></div>`).join('');
+  document.getElementById('customersList').innerHTML = items || '<div class="muted">Nenhum cliente cadastrado.</div>';
+}
+function renderAccounts(){
+  const q = document.getElementById('accountSearch')?.value?.toLowerCase() || '';
+  const items = state.accounts.filter(a=>`${a.label||''} ${a.login||''} ${a.provider||''}`.toLowerCase().includes(q)).map(a=>`<div class="item"><div style="display:flex;justify-content:space-between;gap:10px"><strong>${a.label || a.login}</strong><span class="badge ${a.status==='available'?'ok':a.status==='blocked'?'bad':'warn'}">${a.status}</span></div><div class="small muted">${a.login||''} · fornecedor: ${a.provider||'—'}</div><div class="small muted" style="margin-top:6px">Custo: ${money(a.acquisition_cost)} · adquirida em ${fmtDate(a.acquired_at)}</div></div>`).join('');
+  document.getElementById('accountsList').innerHTML = items || '<div class="muted">Nenhuma conta cadastrada.</div>';
+}
+function renderSales(){
+  const q = document.getElementById('salesSearch')?.value?.toLowerCase() || '';
+  const items = state.sales.filter(s=>{
+    const c=customerById(s.customer_id), a=accountById(s.initial_account_id);
+    return `${c.name||''} ${a.label||a.login||''} ${s.status||''}`.toLowerCase().includes(q);
+  }).map(s=>{
+    const c=customerById(s.customer_id), first=accountById(s.initial_account_id), current=accountById(currentAccountForSale(s)), end=guaranteeEnd(s), d=daysLeft(end), reps=replacementsBySale(s.id).length;
+    return `<div class="item"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><strong>${c.name || 'Cliente'}</strong><div class="small muted">Compra: ${fmtDate(s.sold_at)} · garantia: ${s.warranty_days} dias · preço: ${money(s.sale_price)}</div></div><div>${badgeByDays(d)}</div></div><div class="small" style="margin-top:10px">Conta inicial: <strong>${first.label || first.login || '—'}</strong><br>Conta atual: <strong>${current.label || current.login || '—'}</strong><br>Reposições: <strong>${reps}</strong></div></div>`;
+  }).join('');
+  document.getElementById('salesList').innerHTML = items || '<div class="muted">Nenhuma venda registrada.</div>';
+}
+function renderReplacements(){
+  const items = state.replacements.map(r=>{
+    const sale = state.sales.find(s=>s.id===r.sale_id) || {}, c=customerById(sale.customer_id), a=accountById(r.replacement_account_id), end=guaranteeEnd(sale), d=daysLeft(end);
+    return `<div class="item"><strong>${c.name || 'Cliente'}</strong><div class="small muted">Reposição em ${fmtDate(r.replaced_at)} · conta: ${a.label || a.login || '—'}</div><div class="small muted" style="margin-top:6px">Motivo: ${r.reason || '—'} · garantia original até ${fmtDate(end)} (${d<0?'vencida':'restam '+d+'d'})</div></div>`;
+  }).join('');
+  document.getElementById('replacementsList').innerHTML = items || '<div class="muted">Nenhuma reposição registrada.</div>';
+}
+async function saveCustomer(){
+  const payload = { name: val('customer_name'), whatsapp: val('customer_whatsapp'), email: val('customer_email'), document_ref: val('customer_document'), notes: val('customer_notes') };
+  if(!payload.name) return toast('Informe o nome do cliente.');
+  const { error } = await sb.from('warranty_customers').insert(payload); if(error) return fail(error);
+  clear(['customer_name','customer_whatsapp','customer_email','customer_document','customer_notes']); toast('Cliente salvo.'); await loadAll();
+}
+async function saveAccount(){
+  const payload = { label: val('account_label'), login: val('account_login'), password: val('account_password'), provider: val('account_provider'), acquisition_cost: num('account_cost'), status: val('account_status'), acquired_at: val('account_acquired_at') || null, notes: val('account_notes') };
+  if(!payload.login && !payload.label) return toast('Informe ao menos login ou nome interno.');
+  const { error } = await sb.from('warranty_accounts').insert(payload); if(error) return fail(error);
+  clear(['account_label','account_login','account_password','account_provider','account_cost','account_acquired_at','account_notes']); document.getElementById('account_status').value='available'; toast('Conta salva.'); await loadAll();
+}
+async function saveSale(){
+  const payload = { customer_id: val('sale_customer_id'), initial_account_id: val('sale_initial_account_id'), sold_at: val('sale_sold_at'), warranty_days: num('sale_warranty_days') || 30, sale_price: num('sale_price'), status: val('sale_status'), notes: val('sale_notes') };
+  if(!payload.customer_id || !payload.initial_account_id || !payload.sold_at) return toast('Preencha cliente, conta e data da venda.');
+  let { error } = await sb.from('warranty_sales').insert(payload); if(error) return fail(error);
+  await sb.from('warranty_accounts').update({ status: 'sold' }).eq('id', payload.initial_account_id);
+  clear(['sale_sold_at','sale_price','sale_notes']); document.getElementById('sale_customer_id').value=''; document.getElementById('sale_initial_account_id').value=''; document.getElementById('sale_status').value='active'; document.getElementById('sale_warranty_days').value='30'; toast('Venda registrada.'); await loadAll();
+}
+async function saveReplacement(){
+  const payload = { sale_id: val('replacement_sale_id'), replacement_account_id: val('replacement_account_id'), replaced_at: val('replacement_replaced_at'), reason: val('replacement_reason'), notes: val('replacement_notes') };
+  if(!payload.sale_id || !payload.replacement_account_id || !payload.replaced_at) return toast('Preencha venda, nova conta e data da reposição.');
+  const { error } = await sb.from('warranty_replacements').insert(payload); if(error) return fail(error);
+  await sb.from('warranty_accounts').update({ status: 'replaced' }).eq('id', payload.replacement_account_id);
+  clear(['replacement_replaced_at','replacement_reason','replacement_notes']); document.getElementById('replacement_sale_id').value=''; document.getElementById('replacement_account_id').value=''; toast('Reposição registrada.'); await loadAll();
+}
+function fail(error){ console.error(error); toast(error.message || 'Erro no Supabase.'); }
+function val(id){ return document.getElementById(id).value.trim(); }
+function num(id){ const v = val(id); return v ? Number(v) : null; }
+function clear(ids){ ids.forEach(id=>document.getElementById(id).value=''); }
+function switchTab(name){ document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===name)); document.querySelectorAll('.tab-body').forEach(el=>el.classList.add('hidden')); document.getElementById('tab-'+name).classList.remove('hidden'); }
+function unlockApp(){ if(document.getElementById('pinInput').value !== APP_PIN) return toast('PIN inválido.'); localStorage.setItem('warranty_hub_ok','1'); document.getElementById('loginView').classList.add('hidden'); document.getElementById('appView').classList.remove('hidden'); loadAll(); }
+function logout(){ localStorage.removeItem('warranty_hub_ok'); location.reload(); }
+async function loadSqlPreview(){ try{ const res = await fetch('./sql/setup.sql'); document.getElementById('sqlPreview').textContent = await res.text(); }catch{ document.getElementById('sqlPreview').textContent='Arquivo SQL não encontrado.'; } }
+if(localStorage.getItem('warranty_hub_ok')==='1'){ document.getElementById('loginView').classList.add('hidden'); document.getElementById('appView').classList.remove('hidden'); loadAll(); }
+loadSqlPreview();
+</script>
+</body>
+</html>
